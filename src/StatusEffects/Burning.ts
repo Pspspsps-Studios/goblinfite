@@ -1,10 +1,13 @@
 import { Actor } from "../Actors/Actor";
 import { DamageInstance, FIRE_DAMAGE_TYPE } from "../DamageInstance";
-import { COLLECT_ACTIONS } from "../Events/CollectActions";
+import { listen, Event } from "../Events/EventListener";
+import { TURN_START } from "../Events/TurnStart";
 import { StatusEffect } from "./StatusEffect";
 
 export class Burning implements StatusEffect {
-  constructor(protected myLevel: number, protected actor: Actor) {}
+  constructor(protected myLevel: number, protected actor: Actor) {
+    listen(this, [TURN_START])
+  }
 
   get name(): string {
     return "Burning";
@@ -14,8 +17,8 @@ export class Burning implements StatusEffect {
     return this.myLevel
   }
 
-  async handle(event) {
-    if (event.type === COLLECT_ACTIONS) {
+  async handle(event: Event) {
+    if (event.type === TURN_START && event.turn.actor === this.actor) {
       DamageInstance.process(new DamageInstance(
         this.level,
         [FIRE_DAMAGE_TYPE],

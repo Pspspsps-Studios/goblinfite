@@ -4,7 +4,7 @@
   "description": "* Collect swords!\r * Make new swords!\r * Kill lots of goblins!\r * TAKE THEIR SWORDS!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "cli-game": "npx ts-node ./src/cliGame.ts"
   },
   "author": "",
@@ -17,6 +17,9 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.7"
+    "@types/jest": "^29.5.11",
+    "@types/uuid": "^9.0.7",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1"
   }
 }

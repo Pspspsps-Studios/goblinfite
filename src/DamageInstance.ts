@@ -1,8 +1,8 @@
 import { Actor } from "./Actor";
-import { MISS } from "./Events/Miss";
-import { PRE_HIT } from "./Events/PreHit";
-import { EventListener } from "./Events/EventListener";
-import { HIT } from "./Events/Hit";
+import { MISS, MissEvent } from "./Events/Miss";
+import { PRE_HIT, PreHitEvent } from "./Events/PreHit";
+import { EventListener, broadcastEvent } from "./Events/EventListener";
+import { HIT, HitEvent } from "./Events/Hit";
 
 export const FIRE_DAMAGE_TYPE = "FIRE_DAMAGE_TYPE"
 export const COLD_DAMAGE_TYPE = "COLD_DAMAGE_TYPE"
@@ -37,32 +37,23 @@ export class DamageInstance {
     public isCritical: boolean = false,
     public status: DamageState = "created"
   ) {}
-}
 
-export async function processDamageInstance(damageInstance: DamageInstance): Promise<void> {
-  switch (damageInstance.status) {
-    case "created":
-      damageInstance.target.handle({
-        type: PRE_HIT,
-        damageInstance
-      })
-      break
-    case "evaded":
-      damageInstance.source.handle({
-        type: MISS,
-        damageInstance
-      })
-      damageInstance.status = "applied"
-      break
-    case "hit":
-      damageInstance.target.handle({
-        type: HIT,
-        damageInstance
-      });
-      damageInstance.status = "applied"
-      break
-  };
-  if (damageInstance.status !== "applied") {
-    processDamageInstance(damageInstance)
+  static async process(damageInstance: DamageInstance) {
+    switch (damageInstance.status) {
+      case "created":
+        await broadcastEvent(new PreHitEvent(damageInstance))
+        break
+      case "evaded":
+        await broadcastEvent(new MissEvent(damageInstance))
+        damageInstance.status = "applied"
+        break
+      case "hit":
+        await broadcastEvent(new HitEvent(damageInstance))
+        damageInstance.status = "applied"
+        break
+    };
+    if (damageInstance.status !== "applied") {
+      DamageInstance.process(damageInstance);
+    }
   }
 }

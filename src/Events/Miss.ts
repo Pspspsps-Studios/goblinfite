@@ -2,7 +2,7 @@ import { DamageInstance } from "../DamageInstance";
 
 export const MISS = "MISS";
 
-export type MissEvent = {
-  type: typeof MISS;
-  damageInstance: DamageInstance
+export class MissEvent {
+  type: typeof MISS = MISS;
+  constructor(public damageInstance: DamageInstance) {}
 }

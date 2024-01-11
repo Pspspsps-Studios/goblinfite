@@ -1,30 +1,38 @@
 import { DamageInstance } from "./DamageInstance"
 import { StatusEffect } from "./StatusEffects/StatusEffect"
 import { Sword } from "./Swords/Sword"
-import { CombatEncounter } from "./combatLoop"
-import { Event, EventListener } from "./Events/EventListener"
-import { TURN_START } from "./Events/TurnStart"
+import { Event, EventListener, removeListener } from "./Events/EventListener"
 
 export interface Actor extends EventListener {
   get currentHitPoints(): number
   get maxHitPoints(): number
   get inventory(): Sword[]
-  get equipped(): Sword
+  get equipped(): Sword | null
+  get isDead(): boolean
+  get isAlive(): boolean
   damage(damageInstance: DamageInstance): void
   applyStatusEffect(statusEffect: StatusEffect): void;
   removeStatusEffectByName(statusEffectName: string): void;
 }
 
 export class BaseActor implements Actor {
-  protected myMaxHitPoints: number
-  protected statusEffects: Record<string, StatusEffect>;
+  protected myCurrentHitPoints: number
+  protected statusEffects: Record<string, StatusEffect> = {};
   protected myInventory: Sword[] = []
+  protected myEquippedSword: Sword | null = null;
 
   constructor(
-    protected myCurrentHitPoints: number, 
-    protected myEquippedSword: Sword
+    protected myMaxHitPoints: number, 
     ) {
-    this.myMaxHitPoints = myCurrentHitPoints;
+    this.myCurrentHitPoints = myMaxHitPoints;
+  }
+
+  get isDead(): boolean {
+    return this.myCurrentHitPoints <= 0;
+  }
+
+  get isAlive(): boolean {
+    return this.myCurrentHitPoints > 0;
   }
   
   get currentHitPoints(): number {
@@ -35,10 +43,18 @@ export class BaseActor implements Actor {
     return this.myInventory;
   }
   
-  get equipped(): Sword {
+  get equipped(): Sword | null {
     return this.myEquippedSword
   }
+
+  pickUp(sword: Sword) {
+    this.myInventory.push(sword)
+  }
   
+  equip(sword: Sword) {
+    this.myEquippedSword = sword
+  }
+
   defend(damageInstance: DamageInstance): void {
     damageInstance.status = "hit"
   }
@@ -64,6 +80,9 @@ export class BaseActor implements Actor {
 
   damage(damage: DamageInstance) {
     this.myCurrentHitPoints -= damage.amount
+    if (this.myCurrentHitPoints <= 0) {
+      this.die()
+    }
   }
 
   heal(hitpoints: number) {
@@ -71,5 +90,9 @@ export class BaseActor implements Actor {
   }
 
   async handle<T extends Event>(event: T) {
+  }
+
+  die() {
+    removeListener(this)
   }
 }

@@ -2,7 +2,7 @@ import { CombatEncounter } from "../combatLoop";
 
 export const WIN = "WIN";
 
-export type WinEvent = {
-  type: typeof WIN;
-  combatEncounter: CombatEncounter;
+export class WinEvent {
+  type: typeof WIN = WIN;
+  constructor(public combatEncounter: CombatEncounter) {}
 }

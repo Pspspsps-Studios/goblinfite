@@ -1,5 +1,4 @@
-export interface Action<TArgs = null, TReturn = null> {
+export interface Action<> {
   name: string;
   description: string;
-  execute(TArgs): TReturn;
 }

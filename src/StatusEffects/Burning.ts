@@ -1,6 +1,6 @@
 import { Actor } from "../Actor";
-import { DamageInstance, FIRE_DAMAGE_TYPE, processDamageInstance } from "../DamageInstance";
-import { TURN_START } from "../Events/TurnStart";
+import { DamageInstance, FIRE_DAMAGE_TYPE } from "../DamageInstance";
+import { COLLECT_ACTIONS } from "../Events/CollectActions";
 import { StatusEffect } from "./StatusEffect";
 
 export class Burning implements StatusEffect {
@@ -15,13 +15,14 @@ export class Burning implements StatusEffect {
   }
 
   async handle(event) {
-    if (event.type === TURN_START) {
-      processDamageInstance(new DamageInstance(
+    if (event.type === COLLECT_ACTIONS) {
+      DamageInstance.process(new DamageInstance(
         this.level,
         [FIRE_DAMAGE_TYPE],
         this,
         this.actor
       ))
+      this.myLevel -= 1;
     }
   }
 

@@ -1,14 +1,14 @@
 import { Actor } from "../Actor";
 import { DamageInstance, DamageType, PHYSICAL_DAMAGE_TYPE } from "../DamageInstance";
 import { Event, EventListener } from "../Events/EventListener";
-import { Sword, BaseSword } from "./Sword";
+import { Sword } from "./Sword";
 
-export class SandSword extends BaseSword implements Sword {
+export class SandSword extends Sword {
   protected minDamage: 1;
   protected maxDamage: 1;
 
-  constructor(protected myLevel: number = 2) {
-    super()
+  constructor(owner: Actor, protected myLevel: number = 2) {
+    super(owner)
   }
   
   get damageType(): DamageType {
@@ -22,20 +22,8 @@ export class SandSword extends BaseSword implements Sword {
   get name(): string {
     return "Sand Sword";
   }
+
   get description(): string {
-    throw `What's worse than one stone sword? ${this.level} Stone swords, merged together.`;
-  }
-
-  createAttack(attacker: Actor, target: Actor): DamageInstance {
-    return new DamageInstance(
-      this.randomDamage(this.minDamage, this.maxDamage),
-      [PHYSICAL_DAMAGE_TYPE],
-      this,
-      target,
-      );
-  }
-
-  handle<T extends Event>(event: T): Promise<void> {
-    throw new Error("Method not implemented.");
+    return `What's worse than one stone sword? ${this.level} stone swords, merged together.`;
   }
 }

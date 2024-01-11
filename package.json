@@ -1,0 +1,11 @@
+{
+  "name": "goblinfite",
+  "version": "1.0.0",
+  "description": "* Collect swords!\r * Make new swords!\r * Kill lots of goblins!\r * TAKE THEIR SWORDS!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "UNLICENSED"
+}

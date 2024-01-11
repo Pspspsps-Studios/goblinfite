@@ -1,6 +1,6 @@
 import { Action } from "../../Actions/Action";
 import { Attack } from "../../Actions/Attack";
-import { Actor, BaseActor } from "../../Actor";
+import { Actor, BaseActor } from "../Actor";
 import { DEFEAT } from "../../Events/Defeat";
 import { Event, listen } from "../../Events/EventListener";
 import { HIT } from "../../Events/Hit";

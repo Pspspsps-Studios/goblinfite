@@ -1,5 +1,5 @@
 import { Attack } from "../../Actions/Attack";
-import { BaseActor } from "../../Actor";
+import { BaseActor } from "../Actor";
 import { Event, listen } from "../../Events/EventListener";
 import { HIT } from "../../Events/Hit";
 import { PRE_HIT } from "../../Events/PreHit";

@@ -1,4 +1,4 @@
-import { Actor } from "../Actor";
+import { Actor } from "../Actors/Actor";
 import { DamageInstance, FIRE_DAMAGE_TYPE } from "../DamageInstance";
 import { COLLECT_ACTIONS } from "../Events/CollectActions";
 import { StatusEffect } from "./StatusEffect";

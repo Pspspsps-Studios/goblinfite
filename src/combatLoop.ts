@@ -1,5 +1,5 @@
 import { note } from "@clack/prompts";
-import { Actor } from "./Actor";
+import { Actor } from "./Actors/Actor";
 import { DEFEAT, DefeatEvent } from "./Events/Defeat";
 import { broadcastEvent, clearAllListeners } from "./Events/EventListener";
 import { PRE_COMBAT, PreCombatEvent } from "./Events/PreCombat";

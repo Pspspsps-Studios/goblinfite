@@ -1,4 +1,4 @@
-import { Actor } from "./Actor";
+import { Actor } from "./Actors/Actor";
 import { Turn } from "./Turn";
 import { CombatEncounter } from "./combatLoop";
 

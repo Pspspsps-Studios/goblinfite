@@ -1,4 +1,4 @@
-import { Actor } from "../Actor";
+import { Actor } from "../Actors/Actor";
 import { DamageInstance } from "../DamageInstance";
 import { Event, EventListener } from "../Events/EventListener";
 

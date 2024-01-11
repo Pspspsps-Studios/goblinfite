@@ -1,4 +1,4 @@
-import { Actor } from "../Actor";
+import { Actor } from "../Actors/Actor";
 import { Sword } from "../Swords/Sword";
 import { Action } from "./Action";
 

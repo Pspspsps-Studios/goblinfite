@@ -1,4 +1,4 @@
-import { Actor } from "./Actor";
+import { Actor } from "./Actors/Actor";
 import { MISS, MissEvent } from "./Events/Miss";
 import { PRE_HIT, PreHitEvent } from "./Events/PreHit";
 import { EventListener, broadcastEvent } from "./Events/EventListener";

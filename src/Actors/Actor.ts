@@ -1,7 +1,7 @@
-import { DamageInstance } from "./DamageInstance"
-import { StatusEffect } from "./StatusEffects/StatusEffect"
-import { Sword } from "./Swords/Sword"
-import { Event, EventListener, removeListener } from "./Events/EventListener"
+import { DamageInstance } from "../DamageInstance"
+import { StatusEffect } from "../StatusEffects/StatusEffect"
+import { Sword } from "../Swords/Sword"
+import { Event, EventListener, removeListener } from "../Events/EventListener"
 
 export interface Actor extends EventListener {
   get currentHitPoints(): number

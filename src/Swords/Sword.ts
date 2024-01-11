@@ -1,5 +1,5 @@
 import { Attack } from "../Actions/Attack";
-import { Actor } from "../Actor";
+import { Actor } from "../Actors/Actor";
 import { DamageInstance, DamageType, PHYSICAL_DAMAGE_TYPE } from "../DamageInstance";
 import { COLLECT_ACTIONS } from "../Events/CollectActions";
 import { Event, EventListener, listen } from "../Events/EventListener";

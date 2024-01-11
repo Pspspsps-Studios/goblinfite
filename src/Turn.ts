@@ -1,6 +1,6 @@
 import { Action } from "./Actions/Action"
 import { Attack } from "./Actions/Attack"
-import { Actor } from "./Actor"
+import { Actor } from "./Actors/Actor"
 import { CombatEncounter } from "./combatLoop"
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./Events/CollectActions"
 import { broadcastEvent } from "./Events/EventListener"

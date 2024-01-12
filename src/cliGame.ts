@@ -4,8 +4,8 @@ import { StoneSword } from "./Swords/StoneSword";
 import { CLIPlayer } from "./Actors/Player/CLIPlayer";
 import { CombatEncounter, combatLoop } from "./combatLoop";
 
-function createEnemy() {
-  const goblin = new ClumsyGoblin(Math.ceil(Math.random() * 9))
+function createEnemy(i: number) {
+  const goblin = new ClumsyGoblin(Math.ceil(Math.random() * 9), `Goblin ${i}`)
   const sword = new StoneSword(goblin)
   goblin.pickUp(sword);
   goblin.equip(sword);
@@ -30,7 +30,7 @@ async function game() {
   if (typeof numberOfEnemies === "symbol") {
     throw new Error(`Get outta here with that ${String(numberOfEnemies)}`)
   }
-  const enemies = Array(+numberOfEnemies).fill(0).map(i => createEnemy())
+  const enemies = Array(+numberOfEnemies).fill(0).map((v, i) => createEnemy(i))
   const encounter = new CombatEncounter(createPlayer(), enemies)
   let completed = false;
   while (!completed) {

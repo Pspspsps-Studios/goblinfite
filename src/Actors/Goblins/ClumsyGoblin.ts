@@ -9,9 +9,12 @@ import { SELECT_TARGETS } from "../../Events/SelectTargets";
 
 export class ClumsyGoblin extends BaseActor {
   name = "Clumsy Goblin"
-  constructor(hitPoints: number) {
+  constructor(hitPoints: number, name?: string) {
     super(hitPoints)
     listen(this, [SELECT_ACTION, SELECT_TARGETS, PRE_HIT, HIT])
+    if (name) {
+      this.name = name
+    }
   }
 
   pickRandom<T>(options: T[]): T {
@@ -22,7 +25,6 @@ export class ClumsyGoblin extends BaseActor {
     switch (event.type) {
       case SELECT_ACTION:
         if (event.turn.actor === this) {
-          console.log(event.turn.availableActions)
           event.turn.selectedAction = this.pickRandom(event.turn.availableActions)
         }
         break;
@@ -32,11 +34,6 @@ export class ClumsyGoblin extends BaseActor {
         }
         break;
       case PRE_HIT:
-        if (event.damageInstance.source === this.equipped) {
-          if (Math.random() < 0.4) {
-            event.damageInstance.status = "evaded"
-          }
-        }
         this.onPreHit(event)
         break;
       case HIT:
@@ -45,6 +42,6 @@ export class ClumsyGoblin extends BaseActor {
   }
 
   toString(): string {
-    return `${this.name} with a ${this.equipped?.name} and ${this.currentHitPoints} hit points`
+    return `${this.name} with a ${this.equipped?.name}`
   }
 }

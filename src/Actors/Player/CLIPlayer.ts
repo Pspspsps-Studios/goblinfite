@@ -9,13 +9,14 @@ import { PRE_HIT } from "../../Events/PreHit";
 import { SELECT_ACTION } from "../../Events/SelectAction";
 import { SELECT_TARGETS } from "../../Events/SelectTargets";
 import { WIN } from "../../Events/Win";
+import { MISS } from "../../Events/Miss";
 import { Sword } from "../../Swords/Sword";
 import { multiselect, note, select, text } from "@clack/prompts";
 
 export class CLIPlayer extends BaseActor {
   constructor(hitPoints: number) {
     super(hitPoints)
-    listen(this, [PRE_COMBAT, DEFEAT, WIN, SELECT_ACTION, SELECT_TARGETS, HIT])
+    listen(this, [PRE_COMBAT, DEFEAT, WIN, SELECT_ACTION, SELECT_TARGETS, HIT, MISS])
   }
 
   async handle<T extends Event>(event: T): Promise<void> {
@@ -67,8 +68,14 @@ export class CLIPlayer extends BaseActor {
           event.turn.selectedAction.targets = selected
         }
         break;
-        case HIT:
-          this.onHit(event)
+      case MISS:
+        note(`${event.damageInstance.target} dodges the attack`)
+        break;
+      case HIT:
+        this.onHit(event)
+        note(`${event.damageInstance.target} takes ${event.damageInstance.amount}hp from the attack!`)
+        break;
+          
     }
   }
 

@@ -6,10 +6,8 @@ import { CombatEncounter } from "./combatLoop";
 export type RoundState = "ROUND_BEGIN" | "PLAYER_TURN" | "ENEMY_TURN" | "ROUND_END"
 
 export class Round {
-  protected enemyTurnCount = 0
-  protected currentTurn: Turn
-  constructor(protected combatEncounter: CombatEncounter, protected state: RoundState = "PLAYER_TURN") {
-    this.currentTurn = this.createTurn(this.combatEncounter.player)
+  protected currentTurn: Turn | null = null
+  constructor(protected combatEncounter: CombatEncounter, protected state: RoundState = "ROUND_BEGIN") {
   }
 
   createTurn(actor: Actor): Turn {
@@ -17,39 +15,41 @@ export class Round {
   }
 
   setupNextPlayerTurn() {
+    this.state = "PLAYER_TURN"
     this.currentTurn = this.createTurn(this.combatEncounter.player)
+  }
+
+  findNextLivingEnemy(): Actor | null {
+    const currentEnemy = this.state !== "ENEMY_TURN" ? null : this.currentTurn?.actor;
+    let currentEnemyIndex = this.combatEncounter.enemies.indexOf(currentEnemy);
+    for (const enemy of this.combatEncounter.enemies.slice(currentEnemyIndex + 1)) {
+      if (enemy.isAlive) return enemy
+    }
+    return null;
   }
 
   setupNextEnemyTurn() {
     this.state = "ENEMY_TURN"
-    if (this.combatEncounter.enemies.filter(e => e.isAlive).length) {
-      const deadEnemiesMap = this.combatEncounter.enemies.map(e => e.isDead)
-      while (deadEnemiesMap[this.enemyTurnCount] && this.enemyTurnCount < this.combatEncounter.enemies.length) {
-        this.enemyTurnCount += 1;
-      }
-      if (this.enemyTurnCount >= this.combatEncounter.enemies.length) {
-        this.state = "ROUND_END"
-      }
-      else {
-        this.currentTurn = this.createTurn(this.combatEncounter.enemies[this.enemyTurnCount])
-        this.enemyTurnCount += 1;
-      }
+    const enemy = this.findNextLivingEnemy();
+    if (enemy) {
+      this.currentTurn = this.createTurn(enemy);
+    }
+    else {
+      this.state = "ROUND_END"
     }
   }
 
   static async process(round: Round): Promise<boolean> {
     switch (round.state) {
       case "ROUND_BEGIN":
-        round.state = "PLAYER_TURN"
+        round.setupNextPlayerTurn()
         break;
       case "PLAYER_TURN":
-        await Turn.process(round.currentTurn);
+      case "ENEMY_TURN":
+        await Turn.process(round.currentTurn)
         if (round.currentTurn.state === "TURN_END") {
           round.setupNextEnemyTurn()
         }
-        break;
-      case "ENEMY_TURN":
-        round.setupNextEnemyTurn()
         break;
       case "ROUND_END":
         return true;

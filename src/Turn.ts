@@ -27,7 +27,6 @@ export class Turn {
   ) {}
 
   static async process(turn: Turn): Promise<boolean> {
-    console.log(turn.state, `${turn.actor}`);
     switch (turn.state) {
       case COLLECT_ACTIONS:
         await broadcastEvent(new CollectActionsEvent(turn))

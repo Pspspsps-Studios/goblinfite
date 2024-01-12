@@ -1,8 +1,8 @@
 import { Actor } from "./Actors/Actor";
-import { MISS, MissEvent } from "./Events/Miss";
-import { PRE_HIT, PreHitEvent } from "./Events/PreHit";
+import { MissEvent } from "./Events/Miss";
+import { PreHitEvent } from "./Events/PreHit";
 import { EventListener, broadcastEvent } from "./Events/EventListener";
-import { HIT, HitEvent } from "./Events/Hit";
+import { HitEvent } from "./Events/Hit";
 
 export const FIRE_DAMAGE_TYPE = "FIRE_DAMAGE_TYPE"
 export const COLD_DAMAGE_TYPE = "COLD_DAMAGE_TYPE"

@@ -10,6 +10,7 @@ import { ActionSelectedEvent, ACTION_SELECTED } from "./ActionSelected";
 import { SELECT_ACTION, SelectActionEvent } from "./SelectAction";
 import { EXECUTE_ACTION, ExecuteActionEvent } from "./ExecuteAction";
 import { SELECT_TARGETS, SelectTargetsEvent } from "./SelectTargets";
+import { text } from "@clack/prompts";
 
 export type Event = 
   ActionSelectedEvent |
@@ -33,6 +34,8 @@ export interface EventListener {
 // @todo fuck, the stuff above this might not be good design either.
   
 export async function broadcastEvent(event: Event, index = 0) {
+  console.log(event.type, index);
+  //await text({message: "Go next"})
   if (listeners[event.type].length < index) {
     return
   }
@@ -62,9 +65,15 @@ export function listen(listener: EventListener, events: Event["type"][]) {
 }
 
 export function clearAllListeners() {
+  console.log("REMOVING ALL LISTENERS")
   Object.keys(listeners).forEach((key: string) => listeners[key as Event["type"]] = [])
 }
 
 export function removeListener(listener: EventListener) {
-  Object.keys(listeners).forEach((key: string) => listeners[key as Event["type"]].splice(listeners[key as Event["type"]].indexOf(listener), 1))
+  for (const key of Object.keys(listeners)) {
+    const indexOfListener = listeners[key as Event["type"]].indexOf(listener)
+    if (indexOfListener !== -1) {
+      listeners[key as Event["type"]].splice(indexOfListener, 1)
+    }
+  }
 }

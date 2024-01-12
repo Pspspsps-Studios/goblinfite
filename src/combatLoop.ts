@@ -1,4 +1,3 @@
-import { note } from "@clack/prompts";
 import { Actor } from "./Actors/Actor";
 import { DEFEAT, DefeatEvent } from "./Events/Defeat";
 import { broadcastEvent, clearAllListeners } from "./Events/EventListener";
@@ -18,6 +17,10 @@ export class CombatEncounter {
   ) { 
     this.round = new Round(this)
   }
+
+  hasAnyLivingEnemies(): boolean {
+    return !!this.enemies.filter(e => e.isAlive).length
+  }
 }
 
 export async function combatLoop(combatEncounter: CombatEncounter) {
@@ -34,8 +37,7 @@ export async function combatLoop(combatEncounter: CombatEncounter) {
         combatEncounter.state = DEFEAT
         await broadcastEvent(new DefeatEvent(combatEncounter))
       }
-      const enemyTotalHp = combatEncounter.enemies.reduce((acc, e) => acc + Math.max(e.currentHitPoints, 0), 0)
-      if (enemyTotalHp <= 0) {
+      if (!combatEncounter.hasAnyLivingEnemies) {
         roundComplete = true
         combatEncounter.state = WIN
         await broadcastEvent(new WinEvent(combatEncounter))
@@ -45,7 +47,6 @@ export async function combatLoop(combatEncounter: CombatEncounter) {
       }
       break;
     default:
-      note("We're all good here")
       clearAllListeners()
       return true
   }

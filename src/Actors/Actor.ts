@@ -17,7 +17,7 @@ export interface Actor extends EventListener {
 
 export class BaseActor implements Actor {
   protected myCurrentHitPoints: number
-  protected statusEffects: Record<string, StatusEffect> = {};
+  protected myStatusEffects: Record<string, StatusEffect> = {};
   protected myInventory: Sword[] = []
   protected myEquippedSword: Sword | null = null;
 
@@ -39,6 +39,10 @@ export class BaseActor implements Actor {
     return this.myCurrentHitPoints
   }
 
+  get maxHitPoints(): number {
+    return this.myMaxHitPoints
+  }
+
   get inventory(): Sword[] {
     return this.myInventory;
   }
@@ -47,7 +51,12 @@ export class BaseActor implements Actor {
     return this.myEquippedSword
   }
 
+  get statusEffects(): Record<string, StatusEffect> {
+    return this.myStatusEffects
+  }
+
   pickUp(sword: Sword) {
+    sword.owner = this;
     this.myInventory.push(sword)
   }
   
@@ -60,6 +69,7 @@ export class BaseActor implements Actor {
   }
   
   applyStatusEffect(statusEffect: StatusEffect): void {
+    // @todo The override needs to also unlist one of the status effects.
     if (statusEffect.name in this.statusEffects) {
       if (+statusEffect > +this.statusEffects[statusEffect.name]) {
         this.statusEffects[statusEffect.name] = statusEffect
@@ -71,11 +81,8 @@ export class BaseActor implements Actor {
   }
 
   removeStatusEffectByName(statusEffectName: string): void {
+    removeListener(this.statusEffects[statusEffectName])
     delete this.statusEffects[statusEffectName]
-  }
-
-  get maxHitPoints() {
-    return this.myMaxHitPoints
   }
 
   damage(damage: DamageInstance) {
@@ -94,5 +101,8 @@ export class BaseActor implements Actor {
 
   die() {
     removeListener(this)
+    Object.keys(this.myStatusEffects).forEach(key => this.removeStatusEffectByName(key))
+    this.inventory.forEach(sword => removeListener(sword))
+    this.myStatusEffects = {}
   }
 }

@@ -2,6 +2,8 @@ import { DamageInstance } from "../DamageInstance"
 import { StatusEffect } from "../StatusEffects/StatusEffect"
 import { Sword } from "../Swords/Sword"
 import { Event, EventListener, removeListener } from "../Events/EventListener"
+import { HitEvent } from "../Events/Hit"
+import { PreHitEvent } from "../Events/PreHit"
 
 export interface Actor extends EventListener {
   get currentHitPoints(): number
@@ -97,6 +99,18 @@ export class BaseActor implements Actor {
   }
 
   async handle<T extends Event>(event: T) {
+  }
+
+  onHit(event: HitEvent) {
+    if (event.damageInstance.target === this) {
+      this.damage(event.damageInstance)
+    }
+  }
+
+  onPreHit(event: PreHitEvent) {
+    if (event.damageInstance.target === this && event.damageInstance.status === "created") {
+      event.damageInstance.status = "hit"
+    }
   }
 
   die() {

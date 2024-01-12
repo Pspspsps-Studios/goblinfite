@@ -3,6 +3,8 @@ import { StatusEffect } from "../StatusEffects/StatusEffect";
 import { Sword } from "../Swords/Sword";
 import { BaseActor } from "./Actor";
 import { removeListener } from "../Events/EventListener";
+import { HitEvent } from "../Events/Hit";
+import { PreHitEvent } from "../Events/PreHit";
 
 jest.mock("../Events/EventListener", () => ({
   removeListener: jest.fn()
@@ -143,4 +145,30 @@ it("Will stop its swords from listening when it dies", () => {
   actor.pickUp(sword)
   actor.die();
   expect(removeListener).toHaveBeenCalledWith(sword)
+})
+
+it("Will take damage from hit events", () => {
+  const actor = new BaseActor(3)
+  actor.onHit({damageInstance: {amount: 2, target: actor}} as unknown as HitEvent)
+  expect(actor.currentHitPoints).toBe(1)
+})
+
+it("Will ignore hit events not targeting it", () => {
+  const actor = new BaseActor(3)
+  actor.onHit({damageInstance: {amount: 2, target: {}}} as unknown as HitEvent)
+  expect(actor.currentHitPoints).toBe(3)
+})
+
+it("Will get hit during pre-hit", () => {
+  const actor = new BaseActor(3)
+  const damageInstance = {status: "created", target: actor}
+  actor.onPreHit({damageInstance} as unknown as PreHitEvent)
+  expect(damageInstance.status).toBe("hit");
+})
+
+it("Will ignore prehit events not targeting it", () => {
+  const actor = new BaseActor(3)
+  const damageInstance = {status: "created", target: {}}
+  actor.onPreHit({damageInstance} as unknown as PreHitEvent)
+  expect(damageInstance.status).toBe("created");
 })

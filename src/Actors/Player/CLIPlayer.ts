@@ -21,9 +21,7 @@ export class CLIPlayer extends BaseActor {
   async handle<T extends Event>(event: T): Promise<void> {
     switch (event.type) {
       case PRE_HIT:
-        if (event.damageInstance.target === this && event.damageInstance.status === "created") {
-          event.damageInstance.status = "hit"
-        }
+        this.onPreHit(event)
         break;
       case PRE_COMBAT:
         event.combatEncounter.enemies.forEach(e => note(`A crazed ${e} appears!`))
@@ -70,10 +68,7 @@ export class CLIPlayer extends BaseActor {
         }
         break;
         case HIT:
-          if (event.damageInstance.target === this) {
-            this.damage(event.damageInstance)
-            console.log(`Only ${this.currentHitPoints} left...`)
-          }
+          this.onHit(event)
     }
   }
 

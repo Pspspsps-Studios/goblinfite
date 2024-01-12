@@ -37,14 +37,10 @@ export class ClumsyGoblin extends BaseActor {
             event.damageInstance.status = "evaded"
           }
         }
-        if (event.damageInstance.target === this) {
-          event.damageInstance.status = "hit";
-        }
+        this.onPreHit(event)
         break;
       case HIT:
-        if (event.damageInstance.target === this) {
-          this.damage(event.damageInstance)
-        }
+        this.onHit(event)
     }
   }
 

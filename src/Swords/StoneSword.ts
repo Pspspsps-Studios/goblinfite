@@ -11,11 +11,11 @@ export class StoneSword extends Sword {
     return PHYSICAL_DAMAGE_TYPE;
   }
 
-  protected minDamage = 2
-  protected maxDamage = 4
+  protected minDamage = 2;
+  protected maxDamage = 4;
 
   get name(): string {
-    return "Stone Sword"
+    return "Stone Sword";
   }
 
   get description(): string {
@@ -23,6 +23,6 @@ export class StoneSword extends Sword {
   }
 
   constructor(owner: Actor) {
-    super(owner)
+    super(owner);
   }
 }

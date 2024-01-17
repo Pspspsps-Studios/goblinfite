@@ -1,8 +1,8 @@
-import { Turn } from "../Turn"
+import { Turn } from "../Turn";
 
-export const SELECT_ACTION = "SELECT_ACTION"
+export const SELECT_ACTION = "SELECT_ACTION";
 
 export class SelectActionEvent {
-  type: typeof SELECT_ACTION = SELECT_ACTION
+  type: typeof SELECT_ACTION = SELECT_ACTION;
   constructor(public turn: Turn) {}
 }

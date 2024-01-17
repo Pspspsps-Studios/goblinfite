@@ -5,30 +5,34 @@ import { EventListener, broadcastEvent } from "./Events/EventListener";
 import { HIT, HitEvent } from "./Events/Hit";
 import { COMPLETE } from "./complete";
 
-export const FIRE_DAMAGE_TYPE = "FIRE_DAMAGE_TYPE"
-export const COLD_DAMAGE_TYPE = "COLD_DAMAGE_TYPE"
-export const PHYSICAL_DAMAGE_TYPE = "PHYSICAL_DAMAGE_TYPE"
-export const POISON_DAMAGE_TYPE = "POISON_DAMAGE_TYPE"
-export const PSYCHIC_DAMAGE_TYPE = "PSYCHIC_DAMAGE_TYPE"
-export const ELECTRIC_DAMAGE_TYPE = "ELECTRIC_DAMAGE_TYPE"
-export const FORCE_DAMAGE_TYPE = "FORCE_DAMAGE_TYPE"
-export const ACID_DAMAGE_TYPE = "ACID_DAMAGE_TYPE"
-export const TRUE_DAMAGE_TYPE = "TRUE_DAMAGE_TYPE"
+export const FIRE_DAMAGE_TYPE = "FIRE_DAMAGE_TYPE";
+export const COLD_DAMAGE_TYPE = "COLD_DAMAGE_TYPE";
+export const PHYSICAL_DAMAGE_TYPE = "PHYSICAL_DAMAGE_TYPE";
+export const POISON_DAMAGE_TYPE = "POISON_DAMAGE_TYPE";
+export const PSYCHIC_DAMAGE_TYPE = "PSYCHIC_DAMAGE_TYPE";
+export const ELECTRIC_DAMAGE_TYPE = "ELECTRIC_DAMAGE_TYPE";
+export const FORCE_DAMAGE_TYPE = "FORCE_DAMAGE_TYPE";
+export const ACID_DAMAGE_TYPE = "ACID_DAMAGE_TYPE";
+export const TRUE_DAMAGE_TYPE = "TRUE_DAMAGE_TYPE";
 
-export type DamageType = 
-  typeof FIRE_DAMAGE_TYPE |
-  typeof COLD_DAMAGE_TYPE |
-  typeof PHYSICAL_DAMAGE_TYPE |
-  typeof POISON_DAMAGE_TYPE |
-  typeof PSYCHIC_DAMAGE_TYPE |
-  typeof ELECTRIC_DAMAGE_TYPE |
-  typeof FORCE_DAMAGE_TYPE |
-  typeof ACID_DAMAGE_TYPE |
-  typeof TRUE_DAMAGE_TYPE
+export type DamageType =
+  | typeof FIRE_DAMAGE_TYPE
+  | typeof COLD_DAMAGE_TYPE
+  | typeof PHYSICAL_DAMAGE_TYPE
+  | typeof POISON_DAMAGE_TYPE
+  | typeof PSYCHIC_DAMAGE_TYPE
+  | typeof ELECTRIC_DAMAGE_TYPE
+  | typeof FORCE_DAMAGE_TYPE
+  | typeof ACID_DAMAGE_TYPE
+  | typeof TRUE_DAMAGE_TYPE;
 
 export const DAMAGE_COMPLETE = "DAMAGE_COMPLETE";
 
-export type DamageState = typeof PRE_HIT | typeof EVADE | typeof HIT | typeof COMPLETE
+export type DamageState =
+  | typeof PRE_HIT
+  | typeof EVADE
+  | typeof HIT
+  | typeof COMPLETE;
 
 export class DamageInstance {
   constructor(
@@ -37,25 +41,25 @@ export class DamageInstance {
     public source: EventListener,
     public target: Actor,
     public isCritical: boolean = false,
-    public status: DamageState = PRE_HIT
+    public status: DamageState = PRE_HIT,
   ) {}
 
   static async process(damageInstance: DamageInstance) {
     switch (damageInstance.status) {
       case PRE_HIT:
-        await broadcastEvent(new PreHitEvent(damageInstance))
+        await broadcastEvent(new PreHitEvent(damageInstance));
         if (damageInstance.status === PRE_HIT) {
-          damageInstance.status = HIT
+          damageInstance.status = HIT;
         }
-        break
+        break;
       case EVADE:
-        await broadcastEvent(new EvadeEvent(damageInstance))
-        damageInstance.status = COMPLETE
-        break
+        await broadcastEvent(new EvadeEvent(damageInstance));
+        damageInstance.status = COMPLETE;
+        break;
       case HIT:
-        await broadcastEvent(new HitEvent(damageInstance))
-        damageInstance.status = COMPLETE
-        break
+        await broadcastEvent(new HitEvent(damageInstance));
+        damageInstance.status = COMPLETE;
+        break;
     }
   }
 }

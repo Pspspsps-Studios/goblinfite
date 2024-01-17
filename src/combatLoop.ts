@@ -5,7 +5,12 @@ import { PRE_COMBAT, PreCombatEvent } from "./Events/PreCombat";
 import { WIN, WinEvent } from "./Events/Win";
 import { Round } from "./Round";
 
-export type CombatEncounterState = typeof PRE_COMBAT | "COMBAT" | typeof WIN | typeof DEFEAT | "RETREAT";
+export type CombatEncounterState =
+  | typeof PRE_COMBAT
+  | "COMBAT"
+  | typeof WIN
+  | typeof DEFEAT
+  | "RETREAT";
 
 export class CombatEncounter {
   public round: Round;
@@ -13,13 +18,13 @@ export class CombatEncounter {
   constructor(
     public player: Actor,
     public enemies: Actor[],
-    public state: CombatEncounterState = PRE_COMBAT
-  ) { 
-    this.round = new Round(this)
+    public state: CombatEncounterState = PRE_COMBAT,
+  ) {
+    this.round = new Round(this);
   }
 
   hasAnyLivingEnemies(): boolean {
-    return !!this.enemies.filter(e => e.isAlive).length
+    return !!this.enemies.filter((e) => e.isAlive).length;
   }
 }
 
@@ -27,28 +32,28 @@ export async function combatLoop(combatEncounter: CombatEncounter) {
   let roundComplete = false;
   switch (combatEncounter.state) {
     case PRE_COMBAT:
-      await broadcastEvent(new PreCombatEvent(combatEncounter))
-      combatEncounter.state = "COMBAT"
+      await broadcastEvent(new PreCombatEvent(combatEncounter));
+      combatEncounter.state = "COMBAT";
       break;
     case "COMBAT":
-      roundComplete = await Round.process(combatEncounter.round)
+      roundComplete = await Round.process(combatEncounter.round);
       if (combatEncounter.player.currentHitPoints <= 0) {
-        roundComplete = true
-        combatEncounter.state = DEFEAT
-        await broadcastEvent(new DefeatEvent(combatEncounter))
+        roundComplete = true;
+        combatEncounter.state = DEFEAT;
+        await broadcastEvent(new DefeatEvent(combatEncounter));
       }
       if (!combatEncounter.hasAnyLivingEnemies) {
-        roundComplete = true
-        combatEncounter.state = WIN
-        await broadcastEvent(new WinEvent(combatEncounter))
+        roundComplete = true;
+        combatEncounter.state = WIN;
+        await broadcastEvent(new WinEvent(combatEncounter));
       }
       if (roundComplete && combatEncounter.state === "COMBAT") {
-        combatEncounter.round = new Round(combatEncounter)
+        combatEncounter.round = new Round(combatEncounter);
       }
       break;
     default:
-      clearAllListeners()
-      return true
+      clearAllListeners();
+      return true;
   }
-  return false
+  return false;
 }

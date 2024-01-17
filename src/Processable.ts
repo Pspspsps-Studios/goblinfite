@@ -5,7 +5,10 @@ export abstract class Processable {
 
   abstract process(): Promise<void>
 
-  valueOf() {
-    return this.status === COMPLETE ? 1 : 0;
+  async runProcess() {
+    await this.process()
+    if (this.status !== COMPLETE) {
+      await this.runProcess()
+    }
   }
 }

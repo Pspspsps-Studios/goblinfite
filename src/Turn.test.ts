@@ -10,6 +10,7 @@ import { Attack } from "./Actions/Attack";
 import { Sword } from "./Swords/Sword";
 import { SelectTargetsEvent } from "./Events/SelectTargets";
 import { Wait } from "./Actions/Wait";
+import { COMPLETE } from "./Processable";
 
 jest.mock("./Events/EventListener", () => ({
   broadcastEvent: jest.fn(),
@@ -103,6 +104,7 @@ describe("When the turn's state is EXECUTE_ACTION", () => {
   beforeEach(() => {
     turn = new Turn({} as Actor, {} as CombatEncounter)
     turn.availableActions.push(attackAction, waitAction)
+    turn.selectedAction = waitAction
     turn.state = EXECUTE_ACTION;
   })
 
@@ -117,5 +119,10 @@ describe("When the turn's state is EXECUTE_ACTION", () => {
     turn.selectedAction = waitAction;
     await turn.process()
     expect(broadcastEvent).toHaveBeenCalledWith(new ExecuteActionEvent(waitAction))
+  })
+
+  it("Will change its state to COMPLETE", async () => {
+    await turn.process();
+    expect(turn.state).toBe(COMPLETE)
   })
 })

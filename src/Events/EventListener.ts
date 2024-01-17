@@ -1,6 +1,6 @@
 import { DEFEAT, DefeatEvent } from "./Defeat";
 import { HIT, HitEvent } from "./Hit";
-import { MISS, MissEvent } from "./Miss";
+import { EVADED, EvadeEvent } from "./Evaded";
 import { PRE_COMBAT, PreCombatEvent } from "./PreCombat";
 import { PRE_HIT, PreHitEvent } from "./PreHit";
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./CollectActions";
@@ -18,7 +18,7 @@ export type Event =
   DefeatEvent |
   ExecuteActionEvent |
   HitEvent |
-  MissEvent |
+  EvadeEvent |
   PreCombatEvent |
   PreHitEvent |
   SelectActionEvent |
@@ -35,7 +35,6 @@ export interface EventListener {
   
 export async function broadcastEvent(event: Event, index = 0) {
   console.log(event.type, index);
-  //await text({message: "Go next"})
   if (listeners[event.type].length < index) {
     return
   }
@@ -48,7 +47,7 @@ const listeners: Record<Event["type"], EventListener[]> = {
   [DEFEAT]: [],
   [EXECUTE_ACTION]: [],
   [HIT]: [],
-  [MISS]: [],
+  [EVADED]: [],
   [PRE_COMBAT]: [],
   [PRE_HIT]: [],
   [SELECT_ACTION]: [],

@@ -24,13 +24,13 @@ export class CombatEncounter {
 }
 
 export async function combatLoop(combatEncounter: CombatEncounter) {
+  let roundComplete = false;
   switch (combatEncounter.state) {
     case PRE_COMBAT:
       await broadcastEvent(new PreCombatEvent(combatEncounter))
       combatEncounter.state = "COMBAT"
       break;
     case "COMBAT":
-      let roundComplete = false;
       roundComplete = await Round.process(combatEncounter.round)
       if (combatEncounter.player.currentHitPoints <= 0) {
         roundComplete = true

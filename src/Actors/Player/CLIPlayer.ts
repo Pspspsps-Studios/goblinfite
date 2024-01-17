@@ -9,14 +9,14 @@ import { PRE_HIT } from "../../Events/PreHit";
 import { SELECT_ACTION } from "../../Events/SelectAction";
 import { SELECT_TARGETS } from "../../Events/SelectTargets";
 import { WIN } from "../../Events/Win";
-import { MISS } from "../../Events/Miss";
+import { EVADED } from "../../Events/Evaded";
 import { Sword } from "../../Swords/Sword";
 import { multiselect, note, select, text } from "@clack/prompts";
 
 export class CLIPlayer extends BaseActor {
   constructor(hitPoints: number) {
     super(hitPoints)
-    listen(this, [PRE_COMBAT, DEFEAT, WIN, SELECT_ACTION, SELECT_TARGETS, HIT, MISS])
+    listen(this, [PRE_COMBAT, DEFEAT, WIN, SELECT_ACTION, SELECT_TARGETS, HIT, EVADED])
   }
 
   async handle<T extends Event>(event: T): Promise<void> {
@@ -53,7 +53,7 @@ export class CLIPlayer extends BaseActor {
         break;
       case SELECT_TARGETS:
         if (event.turn.actor === this && event.turn.selectedAction instanceof Attack) {
-          let choices = event.turn.selectedAction.targetCount;
+          const choices = event.turn.selectedAction.targetCount;
           const aliveEnemies = event.turn.combatEncounter.enemies.filter(enemy => !enemy.isDead)
           const options = aliveEnemies.map(goblin => ({value: goblin, label: `${goblin}`}))
           const selected: Actor[] = [];
@@ -68,7 +68,7 @@ export class CLIPlayer extends BaseActor {
           event.turn.selectedAction.targets = selected
         }
         break;
-      case MISS:
+      case EVADED:
         note(`${event.damageInstance.target} dodges the attack`)
         break;
       case HIT:

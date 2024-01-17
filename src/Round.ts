@@ -21,7 +21,7 @@ export class Round {
 
   findNextLivingEnemy(): Actor | null {
     const currentEnemy = this.state !== "ENEMY_TURN" ? null : this.currentTurn?.actor;
-    let currentEnemyIndex = this.combatEncounter.enemies.indexOf(currentEnemy);
+    const currentEnemyIndex = this.combatEncounter.enemies.indexOf(currentEnemy);
     for (const enemy of this.combatEncounter.enemies.slice(currentEnemyIndex + 1)) {
       if (enemy.isAlive) return enemy
     }

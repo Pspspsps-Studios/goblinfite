@@ -1,8 +1,8 @@
 import { DamageInstance } from "../DamageInstance";
 
-export const MISS = "MISS";
+export const EVADE = "EVADE";
 
-export class MissEvent {
-  type: typeof MISS = MISS;
+export class EvadeEvent {
+  type: typeof EVADE = EVADE;
   constructor(public damageInstance: DamageInstance) {}
 }

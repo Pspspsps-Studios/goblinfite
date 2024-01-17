@@ -1,8 +1,9 @@
 import { Actor } from "./Actors/Actor";
-import { MissEvent } from "./Events/Miss";
-import { PreHitEvent } from "./Events/PreHit";
+import { EVADE, EvadeEvent } from "./Events/Evaded";
+import { PRE_HIT, PreHitEvent } from "./Events/PreHit";
 import { EventListener, broadcastEvent } from "./Events/EventListener";
-import { HitEvent } from "./Events/Hit";
+import { HIT, HitEvent } from "./Events/Hit";
+import { COMPLETE } from "./complete";
 
 export const FIRE_DAMAGE_TYPE = "FIRE_DAMAGE_TYPE"
 export const COLD_DAMAGE_TYPE = "COLD_DAMAGE_TYPE"
@@ -25,35 +26,36 @@ export type DamageType =
   typeof ACID_DAMAGE_TYPE |
   typeof TRUE_DAMAGE_TYPE
 
-export type DamageState = "created" | "evaded" | "hit" | "applied"
+export const DAMAGE_COMPLETE = "DAMAGE_COMPLETE";
 
-// The damage instance is a finite state machine that evaluates a damage instance, triggers any necessary effects, and applies the damage.
+export type DamageState = typeof PRE_HIT | typeof EVADE | typeof HIT | typeof COMPLETE
+
 export class DamageInstance {
   constructor(
     public amount: number,
-    public types: DamageType[],
+    public types: DamageType | DamageType[],
     public source: EventListener,
     public target: Actor,
     public isCritical: boolean = false,
-    public status: DamageState = "created"
+    public status: DamageState = PRE_HIT
   ) {}
 
   static async process(damageInstance: DamageInstance) {
     switch (damageInstance.status) {
-      case "created":
+      case PRE_HIT:
         await broadcastEvent(new PreHitEvent(damageInstance))
+        if (damageInstance.status === PRE_HIT) {
+          damageInstance.status = HIT
+        }
         break
-      case "evaded":
-        await broadcastEvent(new MissEvent(damageInstance))
-        damageInstance.status = "applied"
+      case EVADE:
+        await broadcastEvent(new EvadeEvent(damageInstance))
+        damageInstance.status = COMPLETE
         break
-      case "hit":
+      case HIT:
         await broadcastEvent(new HitEvent(damageInstance))
-        damageInstance.status = "applied"
+        damageInstance.status = COMPLETE
         break
-    };
-    if (damageInstance.status !== "applied") {
-      DamageInstance.process(damageInstance);
     }
   }
 }

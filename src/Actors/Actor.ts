@@ -1,3 +1,4 @@
+import { v4 as uuid } from "uuid"
 import { DamageInstance } from "../DamageInstance"
 import { StatusEffect } from "../StatusEffects/StatusEffect"
 import { Sword } from "../Swords/Sword"
@@ -6,6 +7,7 @@ import { HitEvent } from "../Events/Hit"
 import { PreHitEvent } from "../Events/PreHit"
 
 export interface Actor extends EventListener {
+  id: string
   get currentHitPoints(): number
   get maxHitPoints(): number
   get inventory(): Sword[]
@@ -18,6 +20,7 @@ export interface Actor extends EventListener {
 }
 
 export class BaseActor implements Actor {
+  public id: string
   protected myCurrentHitPoints: number
   protected myStatusEffects: Record<string, StatusEffect> = {};
   protected myInventory: Sword[] = []
@@ -27,6 +30,7 @@ export class BaseActor implements Actor {
     protected myMaxHitPoints: number, 
     ) {
     this.myCurrentHitPoints = myMaxHitPoints;
+    this.id = uuid()
   }
 
   get isDead(): boolean {
@@ -109,7 +113,8 @@ export class BaseActor implements Actor {
 
   onPreHit(event: PreHitEvent) {
     if (event.damageInstance.target === this && event.damageInstance.status === "created") {
-      event.damageInstance.status = "hit"
+      console.log("OUCH!", this.id)
+      this.defend(event.damageInstance)
     }
   }
 

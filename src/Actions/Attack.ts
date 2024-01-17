@@ -11,6 +11,6 @@ export class Attack extends Targetable implements Action {
     public sword: Sword,
     public targetCount: number,
   ) {
-    super()
+    super();
   }
 }

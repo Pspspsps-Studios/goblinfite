@@ -1,5 +1,4 @@
 import { Action } from "./Actions/Action";
-import { Targetable } from "./Actions/Targetable";
 import { Actor } from "./Actors/Actor";
 import { CombatEncounter } from "./combatLoop";
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./Events/CollectActions";
@@ -26,7 +25,7 @@ export class Turn extends Processable {
     public actor: Actor,
     public combatEncounter: CombatEncounter,
   ) {
-    super()
+    super();
   }
 
   async process() {
@@ -45,7 +44,7 @@ export class Turn extends Processable {
         }
         await broadcastEvent(new SelectActionEvent(this));
         if (!this.selectedAction) {
-          throw new NoActionSelectedError()
+          throw new NoActionSelectedError();
         }
         this.state = EXECUTE_ACTION;
         break;
@@ -62,12 +61,12 @@ export class Turn extends Processable {
 
 export class NoActionsError extends Error {
   constructor() {
-    super("No actions provided to turn")
+    super("No actions provided to turn");
   }
 }
 
 export class NoActionSelectedError extends Error {
   constructor() {
-    super("No action selected")
+    super("No action selected");
   }
 }

@@ -62,7 +62,7 @@ export abstract class Sword implements EventListener {
     const defender = defenders.pop();
     if (!defender) return;
     // @fix-me
-    new DamageInstance(this.damage, [this.damageType], this, defender)
+    new DamageInstance(this.damage, [this.damageType], this, defender);
     await this.attack(defenders);
   }
 }

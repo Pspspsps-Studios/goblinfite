@@ -1,14 +1,18 @@
 export const COMPLETE = "COMPLETE";
 
 export abstract class Processable {
-  public status: string | typeof COMPLETE
+  public status: string | typeof COMPLETE;
 
-  abstract process(): Promise<void>
+  get isComplete() {
+    return this.status === COMPLETE;
+  }
+
+  abstract process(): Promise<void>;
 
   async runProcess() {
-    await this.process()
+    await this.process();
     if (this.status !== COMPLETE) {
-      await this.runProcess()
+      await this.runProcess();
     }
   }
 }

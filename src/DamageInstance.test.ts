@@ -92,4 +92,4 @@ it("Will change its state to COMPLETE after HIT", async () => {
   );
   await damageInstance.process();
   expect(damageInstance.status).toBe(COMPLETE);
-})
+});

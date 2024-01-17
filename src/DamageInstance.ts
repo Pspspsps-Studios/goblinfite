@@ -43,7 +43,7 @@ export class DamageInstance extends Processable {
     public isCritical: boolean = false,
     public status: DamageState = PRE_HIT,
   ) {
-    super()
+    super();
   }
 
   async process() {

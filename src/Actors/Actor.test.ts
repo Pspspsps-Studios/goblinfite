@@ -2,12 +2,12 @@ import { DamageInstance } from "../DamageInstance";
 import { StatusEffect } from "../StatusEffects/StatusEffect";
 import { Sword } from "../Swords/Sword";
 import { BaseActor } from "./Actor";
-import { Event, removeListener } from "../Events/EventListener";
+import { removeListener } from "../Events/EventListener";
 import { HIT, HitEvent } from "../Events/Hit";
 import { PRE_HIT, PreHitEvent } from "../Events/PreHit";
 
 class TestActor extends BaseActor {
-  handle<T extends Event>(event: T): Promise<void> {
+  handle(): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }

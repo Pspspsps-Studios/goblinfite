@@ -1,33 +1,39 @@
 import { Actor } from "./Actors/Actor";
+import { COMPLETE, Processable } from "./Processable";
 import { Turn } from "./Turn";
 import { CombatEncounter } from "./combatLoop";
 
-// @todo make these event types
-export type RoundState =
-  | "ROUND_BEGIN"
-  | "PLAYER_TURN"
-  | "ENEMY_TURN"
-  | "ROUND_END";
+export const ROUND_BEGIN = "ROUND_BEGIN";
+export const PLAYER_TURN = "PLAYER_TURN";
+export const ENEMY_TURN = "ENEMY_TURN";
 
-export class Round {
-  protected currentTurn: Turn | null = null;
+export type RoundState =
+  typeof ROUND_BEGIN
+  | typeof PLAYER_TURN
+  | typeof ENEMY_TURN
+  | typeof COMPLETE;
+
+export class Round extends Processable {
+  public currentTurn: Turn | null = null;
   constructor(
-    protected combatEncounter: CombatEncounter,
-    protected state: RoundState = "ROUND_BEGIN",
-  ) {}
+    public combatEncounter: CombatEncounter,
+    public status: RoundState = ROUND_BEGIN,
+  ) {
+    super()
+  }
 
   createTurn(actor: Actor): Turn {
     return new Turn(actor, this.combatEncounter);
   }
 
   setupNextPlayerTurn() {
-    this.state = "PLAYER_TURN";
+    this.status = PLAYER_TURN;
     this.currentTurn = this.createTurn(this.combatEncounter.player);
   }
 
   findNextLivingEnemy(): Actor | null {
     const currentEnemy =
-      this.state !== "ENEMY_TURN" ? null : this.currentTurn?.actor;
+      this.status !== ENEMY_TURN ? null : this.currentTurn?.actor;
     const currentEnemyIndex =
       this.combatEncounter.enemies.indexOf(currentEnemy);
     for (const enemy of this.combatEncounter.enemies.slice(
@@ -39,30 +45,30 @@ export class Round {
   }
 
   setupNextEnemyTurn() {
-    this.state = "ENEMY_TURN";
+    this.status = "ENEMY_TURN";
     const enemy = this.findNextLivingEnemy();
     if (enemy) {
       this.currentTurn = this.createTurn(enemy);
     } else {
-      this.state = "ROUND_END";
+      this.status = COMPLETE;
     }
   }
 
-  static async process(round: Round): Promise<boolean> {
-    switch (round.state) {
+  async process() {
+    switch (this.status) {
       case "ROUND_BEGIN":
-        round.setupNextPlayerTurn();
+        this.setupNextPlayerTurn();
         break;
       case "PLAYER_TURN":
       case "ENEMY_TURN":
-        await Turn.process(round.currentTurn);
-        if (round.currentTurn.state === "TURN_END") {
-          round.setupNextEnemyTurn();
+        await this.currentTurn.runProcess();
+        if (this.combatEncounter.player.isDead) {
+          this.status = COMPLETE
+        }
+        else if (this.currentTurn.isComplete) {
+          this.setupNextEnemyTurn();
         }
         break;
-      case "ROUND_END":
-        return true;
     }
-    return false;
   }
 }

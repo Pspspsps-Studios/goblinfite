@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "cli-game": "npx ts-node ./src/cliGame.ts",
-    "lint": "eslint --fix ."
+    "lint": "prettier -w ./src && eslint --fix ./src"
   },
   "author": "",
   "license": "UNLICENSED",

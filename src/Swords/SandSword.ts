@@ -1,10 +1,5 @@
 import { Actor } from "../Actors/Actor";
-import {
-  DamageInstance,
-  DamageType,
-  PHYSICAL_DAMAGE_TYPE,
-} from "../DamageInstance";
-import { Event, EventListener } from "../Events/EventListener";
+import { DamageType, PHYSICAL_DAMAGE_TYPE } from "../DamageInstance";
 import { Sword } from "./Sword";
 
 export class SandSword extends Sword {

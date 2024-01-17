@@ -1,4 +1,3 @@
-import { Attack } from "../Actions/Attack";
 import { Turn } from "../Turn";
 
 export const SELECT_TARGETS = "SELECT_TARGETS";

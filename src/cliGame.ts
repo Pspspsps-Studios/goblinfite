@@ -1,4 +1,4 @@
-import { intro, select, text, note } from "@clack/prompts";
+import { text } from "@clack/prompts";
 import { ClumsyGoblin } from "./Actors/Goblins/ClumsyGoblin";
 import { StoneSword } from "./Swords/StoneSword";
 import { CLIPlayer } from "./Actors/Player/CLIPlayer";
@@ -44,4 +44,6 @@ async function game() {
   }
 }
 
-game();
+game()
+  .then(() => process.exit(0))
+  .catch(() => process.exit(1));

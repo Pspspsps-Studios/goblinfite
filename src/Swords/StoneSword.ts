@@ -1,10 +1,6 @@
-import { Attack } from "../Actions/Attack";
 import { DamageType, PHYSICAL_DAMAGE_TYPE } from "../DamageInstance";
-import { COLLECT_ACTIONS } from "../Events/CollectActions";
 import { Sword } from "./Sword";
-import { listen } from "../Events/EventListener";
 import { Actor } from "../Actors/Actor";
-import { EXECUTE_ACTION } from "../Events/ExecuteAction";
 
 export class StoneSword extends Sword {
   get damageType(): DamageType {

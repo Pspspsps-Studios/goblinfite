@@ -22,7 +22,7 @@ export class Burning implements StatusEffect {
 
   async handle(event: Event) {
     if (event.type === TURN_START && event.turn.actor === this.actor) {
-      DamageInstance.process(
+      await DamageInstance.process(
         new DamageInstance(this.level, [FIRE_DAMAGE_TYPE], this, this.actor),
       );
       this.myLevel -= 1;

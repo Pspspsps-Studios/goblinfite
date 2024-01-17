@@ -16,11 +16,13 @@ export abstract class Sword implements EventListener {
 
   protected myId: string;
 
-  abstract get damageType(): DamageType;
-
   abstract get name(): string;
 
   abstract get description(): string;
+
+  get damageType(): DamageType {
+    return PHYSICAL_DAMAGE_TYPE;
+  }
 
   get damage(): number {
     return Math.floor(

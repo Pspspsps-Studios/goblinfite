@@ -20,29 +20,31 @@ it("Will create a new damage instance", () => {
   expect(damageInstance).toBeInstanceOf(DamageInstance);
 });
 
-it("Will emit PRE_HIT when created", () => {
+it("Will emit PRE_HIT when created", async (done) => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
     {} as EventListener,
     {} as Actor,
   );
-  DamageInstance.process(damageInstance);
+  await DamageInstance.process(damageInstance);
   expect(broadcastEvent).toHaveBeenCalledWith(new PreHitEvent(damageInstance));
+  done();
 });
 
-it("Will change its state to HIT if no listener changes its state", () => {
+it("Will change its state to HIT if no listener changes its state", async (done) => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
     {} as EventListener,
     {} as Actor,
   );
-  DamageInstance.process(damageInstance);
+  await DamageInstance.process(damageInstance);
   expect(damageInstance.status).toBe(HIT);
+  done();
 });
 
-it("Will emit EVADE when evaded", () => {
+it("Will emit EVADE when evaded", async (done) => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
@@ -51,11 +53,12 @@ it("Will emit EVADE when evaded", () => {
     false,
     EVADE,
   );
-  DamageInstance.process(damageInstance);
+  await DamageInstance.process(damageInstance);
   expect(broadcastEvent).toHaveBeenCalledWith(new HitEvent(damageInstance));
+  done();
 });
 
-it("Will change its state to COMPLETE after EVADE", () => {
+it("Will change its state to COMPLETE after EVADE", async (done) => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
@@ -64,11 +67,12 @@ it("Will change its state to COMPLETE after EVADE", () => {
     false,
     EVADE,
   );
-  DamageInstance.process(damageInstance);
+  await DamageInstance.process(damageInstance);
   expect(damageInstance.status).toBe(COMPLETE);
+  done();
 });
 
-it("Will emit HIT when hit", () => {
+it("Will emit HIT when hit", async (done) => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
@@ -77,6 +81,7 @@ it("Will emit HIT when hit", () => {
     false,
     HIT,
   );
-  DamageInstance.process(damageInstance);
+  await DamageInstance.process(damageInstance);
   expect(broadcastEvent).toHaveBeenCalledWith(new EvadeEvent(damageInstance));
+  done();
 });

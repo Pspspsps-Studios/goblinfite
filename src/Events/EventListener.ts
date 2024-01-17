@@ -1,6 +1,6 @@
 import { DEFEAT, DefeatEvent } from "./Defeat";
 import { HIT, HitEvent } from "./Hit";
-import { EVADED, EvadeEvent } from "./Evaded";
+import { EVADE, EvadeEvent } from "./Evaded";
 import { PRE_COMBAT, PreCombatEvent } from "./PreCombat";
 import { PRE_HIT, PreHitEvent } from "./PreHit";
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./CollectActions";
@@ -10,7 +10,6 @@ import { ActionSelectedEvent, ACTION_SELECTED } from "./ActionSelected";
 import { SELECT_ACTION, SelectActionEvent } from "./SelectAction";
 import { EXECUTE_ACTION, ExecuteActionEvent } from "./ExecuteAction";
 import { SELECT_TARGETS, SelectTargetsEvent } from "./SelectTargets";
-import { text } from "@clack/prompts";
 
 export type Event =
   | ActionSelectedEvent
@@ -47,7 +46,7 @@ const listeners: Record<Event["type"], EventListener[]> = {
   [DEFEAT]: [],
   [EXECUTE_ACTION]: [],
   [HIT]: [],
-  [EVADED]: [],
+  [EVADE]: [],
   [PRE_COMBAT]: [],
   [PRE_HIT]: [],
   [SELECT_ACTION]: [],

@@ -3,8 +3,8 @@ import { DamageInstance } from "../DamageInstance";
 import { StatusEffect } from "../StatusEffects/StatusEffect";
 import { Sword } from "../Swords/Sword";
 import { Event, EventListener, removeListener } from "../Events/EventListener";
-import { HitEvent } from "../Events/Hit";
-import { PreHitEvent } from "../Events/PreHit";
+import { HIT, HitEvent } from "../Events/Hit";
+import { PRE_HIT, PreHitEvent } from "../Events/PreHit";
 
 export interface Actor extends EventListener {
   id: string;
@@ -19,7 +19,7 @@ export interface Actor extends EventListener {
   removeStatusEffectByName(statusEffectName: string): void;
 }
 
-export class BaseActor implements Actor {
+export abstract class BaseActor implements Actor {
   public id: string;
   protected myCurrentHitPoints: number;
   protected myStatusEffects: Record<string, StatusEffect> = {};
@@ -69,7 +69,7 @@ export class BaseActor implements Actor {
   }
 
   defend(damageInstance: DamageInstance): void {
-    damageInstance.status = "hit";
+    damageInstance.status = HIT;
   }
 
   applyStatusEffect(statusEffect: StatusEffect): void {
@@ -102,7 +102,7 @@ export class BaseActor implements Actor {
     );
   }
 
-  async handle<T extends Event>(event: T) {}
+  abstract handle<T extends Event>(event: T): Promise<void>;
 
   onHit(event: HitEvent) {
     if (event.damageInstance.target === this) {
@@ -113,9 +113,8 @@ export class BaseActor implements Actor {
   onPreHit(event: PreHitEvent) {
     if (
       event.damageInstance.target === this &&
-      event.damageInstance.status === "created"
+      event.damageInstance.status === PRE_HIT
     ) {
-      console.log("OUCH!", this.id);
       this.defend(event.damageInstance);
     }
   }

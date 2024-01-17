@@ -61,9 +61,8 @@ export abstract class Sword implements EventListener {
   async attack(defenders: Actor[]): Promise<void> {
     const defender = defenders.pop();
     if (!defender) return;
-    await DamageInstance.process(
-      new DamageInstance(this.damage, [this.damageType], this, defender),
-    );
+    // @fix-me
+    new DamageInstance(this.damage, [this.damageType], this, defender)
     await this.attack(defenders);
   }
 }

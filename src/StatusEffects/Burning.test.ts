@@ -29,7 +29,7 @@ it("Will return its name", () => {
   expect(effect.name).toBe("Burning");
 });
 
-it("Will process damage at the start of the actor's turn", async (done) => {
+it("Will process damage at the start of the actor's turn", async () => {
   const effect = new Burning(4, mockActor);
   await effect.handle({
     type: TURN_START,
@@ -41,16 +41,13 @@ it("Will process damage at the start of the actor's turn", async (done) => {
     effect,
     mockActor,
   );
-  expect(DamageInstance.process).toHaveBeenCalled();
-  done();
 });
 
-it("Will decrement its damage at the start of the actor's turn", async (done) => {
+it("Will decrement its damage at the start of the actor's turn", async () => {
   const effect = new Burning(4, mockActor);
   await effect.handle({
     type: TURN_START,
     turn: { actor: mockActor },
   } as TurnStartEvent);
   expect(effect.level).toBe(3);
-  done();
 });

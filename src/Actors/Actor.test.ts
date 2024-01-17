@@ -2,78 +2,84 @@ import { DamageInstance } from "../DamageInstance";
 import { StatusEffect } from "../StatusEffects/StatusEffect";
 import { Sword } from "../Swords/Sword";
 import { BaseActor } from "./Actor";
-import { removeListener } from "../Events/EventListener";
-import { HitEvent } from "../Events/Hit";
-import { PreHitEvent } from "../Events/PreHit";
+import { Event, removeListener } from "../Events/EventListener";
+import { HIT, HitEvent } from "../Events/Hit";
+import { PRE_HIT, PreHitEvent } from "../Events/PreHit";
+
+class TestActor extends BaseActor {
+  handle<T extends Event>(event: T): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+}
 
 jest.mock("../Events/EventListener", () => ({
   removeListener: jest.fn(),
 }));
 
 it("Will know if it's dead", () => {
-  const actor = new BaseActor(1);
+  const actor = new TestActor(1);
   expect(actor.isDead).toBe(false);
-  const deadActor = new BaseActor(0);
+  const deadActor = new TestActor(0);
   expect(deadActor.isDead).toBe(true);
-  const reallyDeadActor = new BaseActor(-3);
+  const reallyDeadActor = new TestActor(-3);
   expect(reallyDeadActor.isDead).toBe(true);
 });
 
 it("Will know if it's alive", () => {
-  const actor = new BaseActor(1);
+  const actor = new TestActor(1);
   expect(actor.isAlive).toBe(true);
-  const deadActor = new BaseActor(0);
+  const deadActor = new TestActor(0);
   expect(deadActor.isAlive).toBe(false);
 });
 
 it("Will know how many hitpoints it has", () => {
-  const actor = new BaseActor(1);
+  const actor = new TestActor(1);
   expect(actor.currentHitPoints).toBe(1);
 });
 
 it("Will know what its maximum hitpoints are", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   expect(actor.maxHitPoints).toBe(3);
 });
 
 it("Will know what it has in its inventory", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   expect(actor.inventory).toStrictEqual([]);
 });
 
 it("Will know what it has equipped", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   expect(actor.equipped).toBe(null);
 });
 
 it("Will know what status effects it has", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   expect(actor.statusEffects).toStrictEqual({});
 });
 
 it("Will be able to add swords to its inventory", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const sword = { owner: null } as Sword;
   actor.pickUp(sword);
   expect(actor.inventory).toStrictEqual([sword]);
 });
 
 it("Will be able to equip swords", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const sword = { owner: null } as Sword;
   actor.equip(sword);
   expect(actor.equipped).toBe(sword);
 });
 
 it("Will take a hit when defending", () => {
-  const actor = new BaseActor(3);
-  const damageInstance = { status: "created" } as DamageInstance;
+  const actor = new TestActor(3);
+  const damageInstance = { status: PRE_HIT } as DamageInstance;
   actor.defend(damageInstance);
-  expect(damageInstance.status).toBe("hit");
+  expect(damageInstance.status).toBe(HIT);
 });
 
 it("Will have new status effects applied", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const statusEffect = {
     name: "test",
     valueOf() {
@@ -85,7 +91,7 @@ it("Will have new status effects applied", () => {
 });
 
 it("Will not apply a lower value status effect", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const mediumStatusEffect = {
     name: "test",
     valueOf() {
@@ -104,7 +110,7 @@ it("Will not apply a lower value status effect", () => {
 });
 
 it("Will apply a higher value status effect", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const mediumStatusEffect = {
     name: "test",
     valueOf() {
@@ -123,7 +129,7 @@ it("Will apply a higher value status effect", () => {
 });
 
 it("Will remove a status effect by name", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const statusEffect = {
     name: "test",
     valueOf() {
@@ -136,33 +142,33 @@ it("Will remove a status effect by name", () => {
 });
 
 it("Will apply damage to itself", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   actor.damage({ amount: 2 } as DamageInstance);
   expect(actor.currentHitPoints).toBe(1);
 });
 
 it("Will heal itself", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   actor.damage({ amount: 2 } as DamageInstance);
   actor.heal(1);
   expect(actor.currentHitPoints).toBe(2);
 });
 
 it("Will not heal more than its maximum hitpoints", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   actor.damage({ amount: 2 } as DamageInstance);
   actor.heal(1000);
   expect(actor.currentHitPoints).toBe(3);
 });
 
 it("Will stop listening when it dies", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   actor.die();
   expect(removeListener).toHaveBeenCalledWith(actor);
 });
 
 it("Will stop its status effects from listening when it dies", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const statusEffect = {
     name: "test",
     valueOf() {
@@ -175,7 +181,7 @@ it("Will stop its status effects from listening when it dies", () => {
 });
 
 it("Will stop its swords from listening when it dies", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   const sword = { owner: null } as Sword;
   actor.pickUp(sword);
   actor.die();
@@ -183,7 +189,7 @@ it("Will stop its swords from listening when it dies", () => {
 });
 
 it("Will take damage from hit events", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   actor.onHit({
     damageInstance: { amount: 2, target: actor },
   } as unknown as HitEvent);
@@ -191,7 +197,7 @@ it("Will take damage from hit events", () => {
 });
 
 it("Will ignore hit events not targeting it", () => {
-  const actor = new BaseActor(3);
+  const actor = new TestActor(3);
   actor.onHit({
     damageInstance: { amount: 2, target: {} },
   } as unknown as HitEvent);
@@ -199,15 +205,15 @@ it("Will ignore hit events not targeting it", () => {
 });
 
 it("Will get hit during pre-hit", () => {
-  const actor = new BaseActor(3);
-  const damageInstance = { status: "created", target: actor };
+  const actor = new TestActor(3);
+  const damageInstance = { status: PRE_HIT, target: actor };
   actor.onPreHit({ damageInstance } as unknown as PreHitEvent);
-  expect(damageInstance.status).toBe("hit");
+  expect(damageInstance.status).toBe(HIT);
 });
 
 it("Will ignore prehit events not targeting it", () => {
-  const actor = new BaseActor(3);
-  const damageInstance = { status: "created", target: {} };
+  const actor = new TestActor(3);
+  const damageInstance = { status: PRE_HIT, target: {} };
   actor.onPreHit({ damageInstance } as unknown as PreHitEvent);
-  expect(damageInstance.status).toBe("created");
+  expect(damageInstance.status).toBe(PRE_HIT);
 });

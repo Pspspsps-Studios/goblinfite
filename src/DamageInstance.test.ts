@@ -4,7 +4,7 @@ import { EVADE, EvadeEvent } from "./Events/Evaded";
 import { EventListener, broadcastEvent } from "./Events/EventListener";
 import { HIT, HitEvent } from "./Events/Hit";
 import { PreHitEvent } from "./Events/PreHit";
-import { COMPLETE } from "./complete";
+import { COMPLETE } from "./Processable";
 
 jest.mock("./Events/EventListener", () => ({
   broadcastEvent: jest.fn(),
@@ -20,31 +20,29 @@ it("Will create a new damage instance", () => {
   expect(damageInstance).toBeInstanceOf(DamageInstance);
 });
 
-it("Will emit PRE_HIT when created", async (done) => {
+it("Will emit PRE_HIT when created", async () => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
     {} as EventListener,
     {} as Actor,
   );
-  await DamageInstance.process(damageInstance);
+  await damageInstance.process();
   expect(broadcastEvent).toHaveBeenCalledWith(new PreHitEvent(damageInstance));
-  done();
 });
 
-it("Will change its state to HIT if no listener changes its state", async (done) => {
+it("Will change its state to HIT if no listener changes its state", async () => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
     {} as EventListener,
     {} as Actor,
   );
-  await DamageInstance.process(damageInstance);
+  await damageInstance.process();
   expect(damageInstance.status).toBe(HIT);
-  done();
 });
 
-it("Will emit EVADE when evaded", async (done) => {
+it("Will emit EVADE when evaded", async () => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
@@ -53,12 +51,11 @@ it("Will emit EVADE when evaded", async (done) => {
     false,
     EVADE,
   );
-  await DamageInstance.process(damageInstance);
-  expect(broadcastEvent).toHaveBeenCalledWith(new HitEvent(damageInstance));
-  done();
+  await damageInstance.process();
+  expect(broadcastEvent).toHaveBeenCalledWith(new EvadeEvent(damageInstance));
 });
 
-it("Will change its state to COMPLETE after EVADE", async (done) => {
+it("Will change its state to COMPLETE after EVADE", async () => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
@@ -67,12 +64,11 @@ it("Will change its state to COMPLETE after EVADE", async (done) => {
     false,
     EVADE,
   );
-  await DamageInstance.process(damageInstance);
+  await damageInstance.process();
   expect(damageInstance.status).toBe(COMPLETE);
-  done();
 });
 
-it("Will emit HIT when hit", async (done) => {
+it("Will emit HIT when hit", async () => {
   const damageInstance = new DamageInstance(
     3,
     TRUE_DAMAGE_TYPE,
@@ -81,7 +77,19 @@ it("Will emit HIT when hit", async (done) => {
     false,
     HIT,
   );
-  await DamageInstance.process(damageInstance);
-  expect(broadcastEvent).toHaveBeenCalledWith(new EvadeEvent(damageInstance));
-  done();
+  await damageInstance.process();
+  expect(broadcastEvent).toHaveBeenCalledWith(new HitEvent(damageInstance));
 });
+
+it("Will change its state to COMPLETE after HIT", async () => {
+  const damageInstance = new DamageInstance(
+    3,
+    TRUE_DAMAGE_TYPE,
+    {} as EventListener,
+    {} as Actor,
+    false,
+    HIT,
+  );
+  await damageInstance.process();
+  expect(damageInstance.status).toBe(COMPLETE);
+})

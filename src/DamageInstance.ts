@@ -3,7 +3,7 @@ import { EVADE, EvadeEvent } from "./Events/Evaded";
 import { PRE_HIT, PreHitEvent } from "./Events/PreHit";
 import { EventListener, broadcastEvent } from "./Events/EventListener";
 import { HIT, HitEvent } from "./Events/Hit";
-import { COMPLETE } from "./complete";
+import { COMPLETE, Processable } from "./Processable";
 
 export const FIRE_DAMAGE_TYPE = "FIRE_DAMAGE_TYPE";
 export const COLD_DAMAGE_TYPE = "COLD_DAMAGE_TYPE";
@@ -34,7 +34,7 @@ export type DamageState =
   | typeof HIT
   | typeof COMPLETE;
 
-export class DamageInstance {
+export class DamageInstance extends Processable {
   constructor(
     public amount: number,
     public types: DamageType | DamageType[],
@@ -42,23 +42,25 @@ export class DamageInstance {
     public target: Actor,
     public isCritical: boolean = false,
     public status: DamageState = PRE_HIT,
-  ) {}
+  ) {
+    super()
+  }
 
-  static async process(damageInstance: DamageInstance) {
-    switch (damageInstance.status) {
+  async process() {
+    switch (this.status) {
       case PRE_HIT:
-        await broadcastEvent(new PreHitEvent(damageInstance));
-        if (damageInstance.status === PRE_HIT) {
-          damageInstance.status = HIT;
+        await broadcastEvent(new PreHitEvent(this));
+        if (this.status === PRE_HIT) {
+          this.status = HIT;
         }
         break;
       case EVADE:
-        await broadcastEvent(new EvadeEvent(damageInstance));
-        damageInstance.status = COMPLETE;
+        await broadcastEvent(new EvadeEvent(this));
+        this.status = COMPLETE;
         break;
       case HIT:
-        await broadcastEvent(new HitEvent(damageInstance));
-        damageInstance.status = COMPLETE;
+        await broadcastEvent(new HitEvent(this));
+        this.status = COMPLETE;
         break;
     }
   }

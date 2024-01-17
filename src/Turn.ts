@@ -1,5 +1,5 @@
 import { Action } from "./Actions/Action";
-import { Attack } from "./Actions/Attack";
+import { Targetable } from "./Actions/Targetable";
 import { Actor } from "./Actors/Actor";
 import { CombatEncounter } from "./combatLoop";
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./Events/CollectActions";
@@ -8,15 +8,16 @@ import { EXECUTE_ACTION, ExecuteActionEvent } from "./Events/ExecuteAction";
 import { SELECT_ACTION, SelectActionEvent } from "./Events/SelectAction";
 import { SelectTargetsEvent } from "./Events/SelectTargets";
 import { TURN_START, TurnStartEvent } from "./Events/TurnStart";
+import { COMPLETE, Processable } from "./Processable";
 
 export type TurnState =
   | typeof TURN_START
   | typeof COLLECT_ACTIONS
   | typeof SELECT_ACTION
   | typeof EXECUTE_ACTION
-  | "TURN_END";
+  | typeof COMPLETE;
 
-export class Turn {
+export class Turn extends Processable {
   public selectedAction: Action | null = null;
   public availableActions: Action[] = [];
   public state: TurnState = COLLECT_ACTIONS;
@@ -24,43 +25,49 @@ export class Turn {
   constructor(
     public actor: Actor,
     public combatEncounter: CombatEncounter,
-  ) {}
+  ) {
+    super()
+  }
 
-  static async process(turn: Turn): Promise<boolean> {
-    switch (turn.state) {
+  async process() {
+    switch (this.state) {
       case COLLECT_ACTIONS:
-        await broadcastEvent(new CollectActionsEvent(turn));
-        turn.state = TURN_START;
+        await broadcastEvent(new CollectActionsEvent(this));
+        this.state = TURN_START;
         break;
       case TURN_START:
-        await broadcastEvent(new TurnStartEvent(turn));
-        turn.state = SELECT_ACTION;
+        await broadcastEvent(new TurnStartEvent(this));
+        this.state = SELECT_ACTION;
         break;
       case SELECT_ACTION:
-        if (!turn.availableActions.length) {
-          throw new Error(`There should be actions, though ${turn.actor}`);
+        if (!this.availableActions.length) {
+          throw new NoActionsError();
         }
-        await broadcastEvent(new SelectActionEvent(turn));
-        if (!turn.selectedAction) {
-          throw new Error(
-            "An action was not selected during SelectActionEvent. Someone's sleeping on the job.",
-          );
+        await broadcastEvent(new SelectActionEvent(this));
+        if (!this.selectedAction) {
+          throw new NoActionSelectedError()
         }
-        turn.state = EXECUTE_ACTION;
+        this.state = EXECUTE_ACTION;
         break;
       case EXECUTE_ACTION:
-        if (!turn.selectedAction) {
-          throw new Error("You should have selected an action");
+        if ("targets" in this.selectedAction) {
+          await broadcastEvent(new SelectTargetsEvent(this));
         }
-        if (turn.selectedAction instanceof Attack) {
-          await broadcastEvent(new SelectTargetsEvent(turn));
-        }
-        await broadcastEvent(new ExecuteActionEvent(turn.selectedAction));
-        turn.state = "TURN_END";
+        await broadcastEvent(new ExecuteActionEvent(this.selectedAction));
+        this.state = COMPLETE;
         break;
-      case "TURN_END":
-        return true;
     }
-    return false;
+  }
+}
+
+export class NoActionsError extends Error {
+  constructor() {
+    super("No actions provided to turn")
+  }
+}
+
+export class NoActionSelectedError extends Error {
+  constructor() {
+    super("No action selected")
   }
 }

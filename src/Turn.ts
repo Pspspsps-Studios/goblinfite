@@ -9,11 +9,14 @@ import { SelectTargetsEvent } from "./Events/SelectTargets";
 import { TURN_START, TurnStartEvent } from "./Events/TurnStart";
 import { COMPLETE, Processable } from "./Processable";
 
+export const PROCESS_RESULTS = "PROCESS_RESULTS";
+
 export type TurnState =
   | typeof TURN_START
   | typeof COLLECT_ACTIONS
   | typeof SELECT_ACTION
   | typeof EXECUTE_ACTION
+  | typeof PROCESS_RESULTS
   | typeof COMPLETE;
 
 export class Turn extends Processable {
@@ -26,6 +29,16 @@ export class Turn extends Processable {
     public combatEncounter: CombatEncounter,
   ) {
     super();
+  }
+
+  get hasResults() {
+    return !!this.selectedAction.result?.length
+  }
+
+  async processResults(results: Processable[]) {
+    if (results.length) {
+      await results.shift().runProcess();
+    }
   }
 
   async process() {
@@ -53,7 +66,18 @@ export class Turn extends Processable {
           await broadcastEvent(new SelectTargetsEvent(this));
         }
         await broadcastEvent(new ExecuteActionEvent(this.selectedAction));
-        this.state = COMPLETE;
+        if ("result" in this.selectedAction && this.selectedAction.result) {
+          this.state = PROCESS_RESULTS
+        }
+        else {
+          this.state = COMPLETE;
+        }
+        break;
+      case PROCESS_RESULTS:
+        await this.processResults(this.selectedAction.result)
+        if (!this.hasResults) {
+          this.state = COMPLETE;
+        }
         break;
     }
   }

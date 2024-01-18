@@ -5,10 +5,10 @@ import {
   DamageType,
   PHYSICAL_DAMAGE_TYPE,
 } from "../DamageInstance";
-import { COLLECT_ACTIONS } from "../Events/CollectActions";
+import { COLLECT_ACTIONS, CollectActionsEvent } from "../Events/CollectActions";
 import { Event, EventListener, listen } from "../Events/EventListener";
 import { v4 as uuid } from "uuid";
-import { EXECUTE_ACTION } from "../Events/ExecuteAction";
+import { EXECUTE_ACTION, ExecuteActionEvent } from "../Events/ExecuteAction";
 
 export abstract class Sword implements EventListener {
   protected abstract minDamage: number;
@@ -43,17 +43,25 @@ export abstract class Sword implements EventListener {
     listen(this, [COLLECT_ACTIONS, EXECUTE_ACTION]);
   }
 
+  async onExecuteAction(event: ExecuteActionEvent) {
+    if (event.action instanceof Attack && event.action.sword === this) {
+      event.action.result = await this.attack(event.action.targets);
+    }
+  }
+
+  async onCollectActions(event: CollectActionsEvent) {
+    if (event.turn.actor.equipped === this) {
+      event.turn.availableActions.push(new Attack(this, 1));
+    }
+  }
+
   async handle(event: Event) {
     switch (event.type) {
       case COLLECT_ACTIONS:
-        if (event.turn.actor.equipped === this) {
-          event.turn.availableActions.push(new Attack(this, 1));
-        }
+        this.onCollectActions(event)
         break;
       case EXECUTE_ACTION:
-        if (event.action instanceof Attack && event.action.sword === this) {
-          await this.attack(event.action.targets);
-        }
+        this.onExecuteAction(event)
         break;
     }
   }

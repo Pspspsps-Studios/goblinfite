@@ -1,5 +1,5 @@
 import { Actor } from "./Actors/Actor";
-import { Turn } from "./Turn";
+import { PROCESS_RESULTS, Turn } from "./Turn";
 import { CombatEncounter } from "./combatLoop";
 import { broadcastEvent } from "./Events/EventListener";
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./Events/CollectActions";
@@ -10,7 +10,8 @@ import { Attack } from "./Actions/Attack";
 import { Sword } from "./Swords/Sword";
 import { SelectTargetsEvent } from "./Events/SelectTargets";
 import { Wait } from "./Actions/Wait";
-import { COMPLETE } from "./Processable";
+import { COMPLETE, Processable } from "./Processable";
+import { DamageInstance } from "./DamageInstance";
 
 jest.mock("./Events/EventListener", () => ({
   broadcastEvent: jest.fn(),
@@ -134,3 +135,49 @@ describe("When the turn's state is EXECUTE_ACTION", () => {
     expect(turn.state).toBe(COMPLETE);
   });
 });
+
+it("Will know if its action has results", () => {
+  const attackAction = new Attack({} as Sword, 1);
+  const result1 = {runProcess: jest.fn()} as unknown as DamageInstance
+  const result2 = {runProcess: jest.fn()} as unknown as DamageInstance
+  attackAction.result = [result1, result2]
+  const turn = new Turn({} as Actor, {} as CombatEncounter);
+  turn.selectedAction = attackAction;
+
+  expect(turn.hasResults).toBeTruthy()
+})
+
+it("Will know if its action does not have results", () => {
+  const attackAction = new Attack({} as Sword, 1);
+  const turn = new Turn({} as Actor, {} as CombatEncounter);
+  turn.selectedAction = attackAction;
+  
+  expect(turn.hasResults).toBeFalsy()
+
+  attackAction.result = []
+  expect(turn.hasResults).toBeFalsy()
+})
+
+describe("When the turn's state is PROCESS_RESULTS", () => {
+  let turn: Turn;
+  const attackAction = new Attack({} as Sword, 1);
+  const result1 = {runProcess: jest.fn()} as unknown as DamageInstance
+  const result2 = {runProcess: jest.fn()} as unknown as DamageInstance
+  attackAction.result = [result1, result2]
+
+  beforeEach(() => {
+    turn = new Turn({} as Actor, {} as CombatEncounter);
+    turn.availableActions.push(attackAction);
+    turn.selectedAction = attackAction;
+    turn.state = PROCESS_RESULTS;
+  });
+
+  it("Will process results", async () => {
+    await turn.process();
+    expect(result1.runProcess).toHaveBeenCalled()
+    expect(turn.state).toBe(PROCESS_RESULTS)
+    await turn.process();
+    expect(result2.runProcess).toHaveBeenCalled()
+    expect(turn.state).toBe(COMPLETE);
+  })
+})

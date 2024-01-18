@@ -8,7 +8,7 @@ export const PLAYER_TURN = "PLAYER_TURN";
 export const ENEMY_TURN = "ENEMY_TURN";
 
 export type RoundState =
-  typeof ROUND_BEGIN
+  | typeof ROUND_BEGIN
   | typeof PLAYER_TURN
   | typeof ENEMY_TURN
   | typeof COMPLETE;
@@ -19,7 +19,7 @@ export class Round extends Processable {
     public combatEncounter: CombatEncounter,
     public status: RoundState = ROUND_BEGIN,
   ) {
-    super()
+    super();
   }
 
   createTurn(actor: Actor): Turn {
@@ -63,9 +63,8 @@ export class Round extends Processable {
       case "ENEMY_TURN":
         await this.currentTurn.runProcess();
         if (this.combatEncounter.player.isDead) {
-          this.status = COMPLETE
-        }
-        else if (this.currentTurn.isComplete) {
+          this.status = COMPLETE;
+        } else if (this.currentTurn.isComplete) {
           this.setupNextEnemyTurn();
         }
         break;

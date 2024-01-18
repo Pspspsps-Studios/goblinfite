@@ -1,7 +1,7 @@
 import { Actor } from "./Actors/Actor";
 import { EVADE, EvadeEvent } from "./Events/Evaded";
 import { PRE_HIT, PreHitEvent } from "./Events/PreHit";
-import { EventListener, broadcastEvent } from "./Events/EventListener";
+import { EventListener, emit } from "./Events/EventListener";
 import { HIT, HitEvent } from "./Events/Hit";
 import { COMPLETE, Processable } from "./Processable";
 
@@ -49,17 +49,17 @@ export class DamageInstance extends Processable {
   async process() {
     switch (this.status) {
       case PRE_HIT:
-        await broadcastEvent(new PreHitEvent(this));
+        await emit(new PreHitEvent(this));
         if (this.status === PRE_HIT) {
           this.status = HIT;
         }
         break;
       case EVADE:
-        await broadcastEvent(new EvadeEvent(this));
+        await emit(new EvadeEvent(this));
         this.status = COMPLETE;
         break;
       case HIT:
-        await broadcastEvent(new HitEvent(this));
+        await emit(new HitEvent(this));
         this.status = COMPLETE;
         break;
     }

@@ -58,20 +58,25 @@ export abstract class Sword implements EventListener {
   async handle(event: Event) {
     switch (event.type) {
       case COLLECT_ACTIONS:
-        this.onCollectActions(event)
+        await this.onCollectActions(event);
         break;
       case EXECUTE_ACTION:
-        this.onExecuteAction(event)
+        await this.onExecuteAction(event);
         break;
     }
   }
 
   async attack(defenders: Actor[]): Promise<DamageInstance[]> {
     const defender = defenders.pop();
-    if (!defender) return;
+    if (!defender) return [];
     // @fix-me
-    const result = new DamageInstance(this.damage, [this.damageType], this, defender);
+    const result = new DamageInstance(
+      this.damage,
+      [this.damageType],
+      this,
+      defender,
+    );
     const otherResults = await this.attack(defenders);
-    return [result, ...otherResults]
+    return [result, ...otherResults];
   }
 }

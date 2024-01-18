@@ -32,13 +32,12 @@ export interface EventListener {
 // @todo Everything after this isn't good design. It hides portions of the process outside of the normal program flow.
 // @todo fuck, the stuff above this might not be good design either.
 
-export async function broadcastEvent(event: Event, index = 0) {
-  console.log(event.type, index);
+export async function emit(event: Event, index = 0) {
   if (listeners[event.type].length < index) {
     return;
   }
   await listeners[event.type][index]?.handle(event);
-  await broadcastEvent(event, index + 1);
+  await emit(event, index + 1);
 }
 
 const listeners: Record<Event["type"], EventListener[]> = {
@@ -63,7 +62,6 @@ export function listen(listener: EventListener, events: Event["type"][]) {
 }
 
 export function clearAllListeners() {
-  console.log("REMOVING ALL LISTENERS");
   Object.keys(listeners).forEach(
     (key: string) => (listeners[key as Event["type"]] = []),
   );

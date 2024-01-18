@@ -62,7 +62,10 @@ export class Round extends Processable {
       case "PLAYER_TURN":
       case "ENEMY_TURN":
         await this.currentTurn.runProcess();
-        if (this.combatEncounter.player.isDead) {
+        if (
+          this.combatEncounter.player.isDead ||
+          !this.combatEncounter.hasAnyLivingEnemies
+        ) {
           this.status = COMPLETE;
         } else if (this.currentTurn.isComplete) {
           this.setupNextEnemyTurn();

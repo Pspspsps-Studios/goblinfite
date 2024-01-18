@@ -9,7 +9,7 @@ export class Attack extends Targetable implements Action {
   description = "Just hit a goblin";
   targets: Actor[] = [];
   result: DamageInstance[] = [];
-  
+
   constructor(
     public sword: Sword,
     public targetCount: number,

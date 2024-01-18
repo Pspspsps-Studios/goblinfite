@@ -2,7 +2,7 @@ import { text } from "@clack/prompts";
 import { ClumsyGoblin } from "./Actors/Goblins/ClumsyGoblin";
 import { StoneSword } from "./Swords/StoneSword";
 import { CLIPlayer } from "./Actors/Player/CLIPlayer";
-import { CombatEncounter, combatLoop } from "./combatLoop";
+import { CombatEncounter } from "./combatLoop";
 
 function createEnemy(i: number) {
   const goblin = new ClumsyGoblin(Math.ceil(Math.random() * 9), `Goblin ${i}`);
@@ -38,10 +38,7 @@ async function game() {
     .fill(0)
     .map((v, i) => createEnemy(i));
   const encounter = new CombatEncounter(createPlayer(), enemies);
-  let completed = false;
-  while (!completed) {
-    completed = await combatLoop(encounter);
-  }
+  await encounter.runProcess();
 }
 
 game()

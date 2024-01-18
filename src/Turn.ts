@@ -2,7 +2,7 @@ import { Action } from "./Actions/Action";
 import { Actor } from "./Actors/Actor";
 import { CombatEncounter } from "./combatLoop";
 import { COLLECT_ACTIONS, CollectActionsEvent } from "./Events/CollectActions";
-import { broadcastEvent } from "./Events/EventListener";
+import { emit } from "./Events/EventListener";
 import { EXECUTE_ACTION, ExecuteActionEvent } from "./Events/ExecuteAction";
 import { SELECT_ACTION, SelectActionEvent } from "./Events/SelectAction";
 import { SelectTargetsEvent } from "./Events/SelectTargets";
@@ -22,7 +22,7 @@ export type TurnState =
 export class Turn extends Processable {
   public selectedAction: Action | null = null;
   public availableActions: Action[] = [];
-  public state: TurnState = COLLECT_ACTIONS;
+  public status: TurnState = COLLECT_ACTIONS;
 
   constructor(
     public actor: Actor,
@@ -32,7 +32,7 @@ export class Turn extends Processable {
   }
 
   get hasResults() {
-    return !!this.selectedAction.result?.length
+    return !!this.selectedAction.result?.length;
   }
 
   async processResults(results: Processable[]) {
@@ -42,41 +42,40 @@ export class Turn extends Processable {
   }
 
   async process() {
-    switch (this.state) {
+    switch (this.status) {
       case COLLECT_ACTIONS:
-        await broadcastEvent(new CollectActionsEvent(this));
-        this.state = TURN_START;
+        await emit(new CollectActionsEvent(this));
+        this.status = TURN_START;
         break;
       case TURN_START:
-        await broadcastEvent(new TurnStartEvent(this));
-        this.state = SELECT_ACTION;
+        await emit(new TurnStartEvent(this));
+        this.status = SELECT_ACTION;
         break;
       case SELECT_ACTION:
         if (!this.availableActions.length) {
           throw new NoActionsError();
         }
-        await broadcastEvent(new SelectActionEvent(this));
+        await emit(new SelectActionEvent(this));
         if (!this.selectedAction) {
           throw new NoActionSelectedError();
         }
-        this.state = EXECUTE_ACTION;
+        this.status = EXECUTE_ACTION;
         break;
       case EXECUTE_ACTION:
         if ("targets" in this.selectedAction) {
-          await broadcastEvent(new SelectTargetsEvent(this));
+          await emit(new SelectTargetsEvent(this));
         }
-        await broadcastEvent(new ExecuteActionEvent(this.selectedAction));
+        await emit(new ExecuteActionEvent(this.selectedAction));
         if ("result" in this.selectedAction && this.selectedAction.result) {
-          this.state = PROCESS_RESULTS
-        }
-        else {
-          this.state = COMPLETE;
+          this.status = PROCESS_RESULTS;
+        } else {
+          this.status = COMPLETE;
         }
         break;
       case PROCESS_RESULTS:
-        await this.processResults(this.selectedAction.result)
+        await this.processResults(this.selectedAction.result);
         if (!this.hasResults) {
-          this.state = COMPLETE;
+          this.status = COMPLETE;
         }
         break;
     }

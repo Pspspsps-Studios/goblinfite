@@ -64,6 +64,7 @@ export class CLIPlayer extends BaseActor {
   }
 
   async onSelectTargets(event: SelectTargetsEvent) {
+    console.log(event.turn.combatEncounter.hasAnyLivingEnemies());
     if (
       event.turn.actor === this &&
       event.turn.selectedAction instanceof Attack

@@ -2,6 +2,7 @@ export const COMPLETE = "COMPLETE";
 
 export abstract class Processable {
   public status: string | typeof COMPLETE;
+  public state: never;
 
   get isComplete() {
     return this.status === COMPLETE;

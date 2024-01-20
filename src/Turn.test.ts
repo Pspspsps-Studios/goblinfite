@@ -12,6 +12,7 @@ import { SelectTargetsEvent } from "./Events/SelectTargets";
 import { Wait } from "./Actions/Wait";
 import { COMPLETE } from "./Processable";
 import { DamageInstance } from "./DamageInstance";
+import { TURN_END } from "./Events/TurnEnd";
 
 jest.mock("./Events/EventListener", () => ({
   emit: jest.fn(),
@@ -174,6 +175,6 @@ describe("When the turn's state is PROCESS_RESULTS", () => {
     expect(turn.status).toBe(PROCESS_RESULTS);
     await turn.process();
     expect(result2.runProcess).toHaveBeenCalled();
-    expect(turn.status).toBe(COMPLETE);
+    expect(turn.status).toBe(TURN_END);
   });
 });

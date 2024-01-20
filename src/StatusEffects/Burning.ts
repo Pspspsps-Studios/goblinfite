@@ -9,7 +9,7 @@ export class Burning implements StatusEffect {
     protected myLevel: number,
     protected actor: Actor,
   ) {
-    listen(this, [TURN_START]);
+    listen(this, TURN_START);
   }
 
   get name(): string {

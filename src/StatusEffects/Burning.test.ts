@@ -11,7 +11,7 @@ const mockActor = {} as Actor;
 
 it("Will register its listeners", () => {
   const effect = new Burning(4, mockActor);
-  expect(listen).toHaveBeenCalledWith(effect, [TURN_START]);
+  expect(listen).toHaveBeenCalledWith(effect, TURN_START);
 });
 
 it("Will return its level", () => {

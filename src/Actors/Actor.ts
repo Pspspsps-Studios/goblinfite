@@ -3,8 +3,7 @@ import { DamageInstance } from "../DamageInstance";
 import { StatusEffect } from "../StatusEffects/StatusEffect";
 import { Sword } from "../Swords/Sword";
 import { Event, EventListener, removeListener } from "../Events/EventListener";
-import { HIT, HitEvent } from "../Events/Hit";
-import { PRE_HIT, PreHitEvent } from "../Events/PreHit";
+import { HitEvent } from "../Events/Hit";
 
 export interface Actor extends EventListener {
   id: string;
@@ -68,10 +67,6 @@ export abstract class BaseActor implements Actor {
     this.myEquippedSword = sword;
   }
 
-  defend(damageInstance: DamageInstance): void {
-    damageInstance.status = HIT;
-  }
-
   applyStatusEffect(statusEffect: StatusEffect): void {
     // @todo The override needs to also unlist one of the status effects.
     if (statusEffect.name in this.statusEffects) {
@@ -102,20 +97,13 @@ export abstract class BaseActor implements Actor {
     );
   }
 
-  abstract handle<T extends Event>(event: T): Promise<void>;
+  async handle(event: Event) {
+    switch (event.type) {}
+  };
 
-  onHit(event: HitEvent) {
+  async onHit(event: HitEvent) {
     if (event.damageInstance.target === this) {
       this.damage(event.damageInstance);
-    }
-  }
-
-  onPreHit(event: PreHitEvent) {
-    if (
-      event.damageInstance.target === this &&
-      event.damageInstance.status === PRE_HIT
-    ) {
-      this.defend(event.damageInstance);
     }
   }
 

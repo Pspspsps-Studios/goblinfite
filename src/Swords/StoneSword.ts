@@ -1,6 +1,5 @@
 import { DamageType, PHYSICAL_DAMAGE_TYPE } from "../DamageInstance";
 import { Sword } from "./Sword";
-import { Actor } from "../Actors/Actor";
 
 export class StoneSword extends Sword {
   get damageType(): DamageType {
@@ -16,9 +15,5 @@ export class StoneSword extends Sword {
 
   get description(): string {
     throw "Forged from the hardest limestone, this sword packs an absolutely mediocre bite. Good luck, adventurer.";
-  }
-
-  constructor(owner: Actor) {
-    super(owner);
   }
 }

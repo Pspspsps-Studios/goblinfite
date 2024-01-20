@@ -5,7 +5,6 @@ import { DEFEAT } from "../../Events/Defeat";
 import { Event, listen } from "../../Events/EventListener";
 import { HIT } from "../../Events/Hit";
 import { PRE_COMBAT } from "../../Events/PreCombat";
-import { PRE_HIT } from "../../Events/PreHit";
 import { SELECT_ACTION, SelectActionEvent } from "../../Events/SelectAction";
 import { SELECT_TARGETS, SelectTargetsEvent } from "../../Events/SelectTargets";
 import { WIN, WinEvent } from "../../Events/Win";
@@ -16,7 +15,7 @@ import { multiselect, note, select } from "@clack/prompts";
 export class CLIPlayer extends BaseActor {
   constructor(hitPoints: number) {
     super(hitPoints);
-    listen(this, [
+    listen(this, 
       PRE_COMBAT,
       DEFEAT,
       WIN,
@@ -24,7 +23,7 @@ export class CLIPlayer extends BaseActor {
       SELECT_TARGETS,
       HIT,
       EVADE,
-    ]);
+    );
   }
 
   async onWin(event: WinEvent) {
@@ -64,7 +63,6 @@ export class CLIPlayer extends BaseActor {
   }
 
   async onSelectTargets(event: SelectTargetsEvent) {
-    console.log(event.turn.combatEncounter.hasAnyLivingEnemies());
     if (
       event.turn.actor === this &&
       event.turn.selectedAction instanceof Attack
@@ -98,9 +96,6 @@ export class CLIPlayer extends BaseActor {
 
   async handle<T extends Event>(event: T): Promise<void> {
     switch (event.type) {
-      case PRE_HIT:
-        this.onPreHit(event);
-        break;
       case PRE_COMBAT:
         event.combatEncounter.enemies.forEach((e) =>
           note(`A crazed ${e} appears!`),

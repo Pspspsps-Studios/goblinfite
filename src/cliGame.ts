@@ -17,7 +17,6 @@ function createPlayer() {
   const sword = new StoneSword(player);
   player.pickUp(sword);
   player.equip(sword);
-  console.log("PLAYER ID", player.id);
   return player;
 }
 

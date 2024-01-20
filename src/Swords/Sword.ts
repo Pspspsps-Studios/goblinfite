@@ -40,7 +40,7 @@ export abstract class Sword implements EventListener {
 
   constructor(public owner: Actor) {
     this.myId = uuid();
-    listen(this, [COLLECT_ACTIONS, EXECUTE_ACTION]);
+    listen(this, COLLECT_ACTIONS, EXECUTE_ACTION);
   }
 
   async onExecuteAction(event: ExecuteActionEvent) {
@@ -67,16 +67,6 @@ export abstract class Sword implements EventListener {
   }
 
   async attack(defenders: Actor[]): Promise<DamageInstance[]> {
-    const defender = defenders.pop();
-    if (!defender) return [];
-    // @fix-me
-    const result = new DamageInstance(
-      this.damage,
-      [this.damageType],
-      this,
-      defender,
-    );
-    const otherResults = await this.attack(defenders);
-    return [result, ...otherResults];
+    return defenders.map(defender => new DamageInstance(this.damage, this.damageType, this, defender))
   }
 }

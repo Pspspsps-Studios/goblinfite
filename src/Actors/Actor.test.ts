@@ -3,8 +3,7 @@ import { StatusEffect } from "../StatusEffects/StatusEffect";
 import { Sword } from "../Swords/Sword";
 import { BaseActor } from "./Actor";
 import { removeListener } from "../Events/EventListener";
-import { HIT, HitEvent } from "../Events/Hit";
-import { PRE_HIT, PreHitEvent } from "../Events/PreHit";
+import { HitEvent } from "../Events/Hit";
 
 class TestActor extends BaseActor {
   handle(): Promise<void> {
@@ -69,13 +68,6 @@ it("Will be able to equip swords", () => {
   const sword = { owner: null } as Sword;
   actor.equip(sword);
   expect(actor.equipped).toBe(sword);
-});
-
-it("Will take a hit when defending", () => {
-  const actor = new TestActor(3);
-  const damageInstance = { status: PRE_HIT } as DamageInstance;
-  actor.defend(damageInstance);
-  expect(damageInstance.status).toBe(HIT);
 });
 
 it("Will have new status effects applied", () => {
@@ -202,18 +194,4 @@ it("Will ignore hit events not targeting it", () => {
     damageInstance: { amount: 2, target: {} },
   } as unknown as HitEvent);
   expect(actor.currentHitPoints).toBe(3);
-});
-
-it("Will get hit during pre-hit", () => {
-  const actor = new TestActor(3);
-  const damageInstance = { status: PRE_HIT, target: actor };
-  actor.onPreHit({ damageInstance } as unknown as PreHitEvent);
-  expect(damageInstance.status).toBe(HIT);
-});
-
-it("Will ignore prehit events not targeting it", () => {
-  const actor = new TestActor(3);
-  const damageInstance = { status: PRE_HIT, target: {} };
-  actor.onPreHit({ damageInstance } as unknown as PreHitEvent);
-  expect(damageInstance.status).toBe(PRE_HIT);
 });

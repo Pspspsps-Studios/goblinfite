@@ -25,7 +25,7 @@ export class CombatEncounter extends Processable {
     super();
   }
 
-  hasAnyLivingEnemies(): boolean {
+  get hasAnyLivingEnemies(): boolean {
     return !!this.enemies.filter((e) => e.isAlive).length;
   }
 

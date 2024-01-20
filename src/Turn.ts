@@ -6,6 +6,7 @@ import { emit } from "./Events/EventListener";
 import { EXECUTE_ACTION, ExecuteActionEvent } from "./Events/ExecuteAction";
 import { SELECT_ACTION, SelectActionEvent } from "./Events/SelectAction";
 import { SelectTargetsEvent } from "./Events/SelectTargets";
+import { TURN_END, TurnEndEvent } from "./Events/TurnEnd";
 import { TURN_START, TurnStartEvent } from "./Events/TurnStart";
 import { COMPLETE, Processable } from "./Processable";
 
@@ -17,6 +18,7 @@ export type TurnState =
   | typeof SELECT_ACTION
   | typeof EXECUTE_ACTION
   | typeof PROCESS_RESULTS
+  | typeof TURN_END
   | typeof COMPLETE;
 
 export class Turn extends Processable {
@@ -75,9 +77,12 @@ export class Turn extends Processable {
       case PROCESS_RESULTS:
         await this.processResults(this.selectedAction.result);
         if (!this.hasResults) {
-          this.status = COMPLETE;
+          this.status = TURN_END;
         }
         break;
+      case TURN_END:
+        await emit(new TurnEndEvent(this));
+        this.status = COMPLETE
     }
   }
 }

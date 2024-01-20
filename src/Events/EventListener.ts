@@ -10,6 +10,7 @@ import { ActionSelectedEvent, ACTION_SELECTED } from "./ActionSelected";
 import { SELECT_ACTION, SelectActionEvent } from "./SelectAction";
 import { EXECUTE_ACTION, ExecuteActionEvent } from "./ExecuteAction";
 import { SELECT_TARGETS, SelectTargetsEvent } from "./SelectTargets";
+import { TURN_END, TurnEndEvent } from "./TurnEnd";
 
 export type Event =
   | ActionSelectedEvent
@@ -23,10 +24,22 @@ export type Event =
   | SelectActionEvent
   | SelectTargetsEvent
   | TurnStartEvent
+  | TurnEndEvent
   | WinEvent;
 
 export interface EventListener {
-  handle<T extends Event>(event: T): Promise<void>;
+  handle(event: Event): Promise<void>;
+  onActionSelected?(event: ActionSelectedEvent): Promise<void>;
+  onDefeat?(event: DefeatEvent): Promise<void>;
+  onExecuteAction?(event: ExecuteActionEvent): Promise<void>;
+  onHit?(event: HitEvent): Promise<void>;
+  onEvade?(event: EvadeEvent): Promise<void>;
+  onPreCombat?(event: PreCombatEvent): Promise<void>;
+  onSelectAction?(event: SelectActionEvent): Promise<void>;
+  onSelectTargets?(event: SelectTargetsEvent): Promise<void>;
+  onTurnStart?(event: TurnStartEvent): Promise<void>;
+  onTurnEnd?(event: TurnEndEvent): Promise<void>;
+  onWin?(event: WinEvent): Promise<void>;
 }
 
 // @todo Everything after this isn't good design. It hides portions of the process outside of the normal program flow.
@@ -52,12 +65,15 @@ const listeners: Record<Event["type"], EventListener[]> = {
   [SELECT_TARGETS]: [],
   [COLLECT_ACTIONS]: [],
   [TURN_START]: [],
+  [TURN_END]: [],
   [WIN]: [],
 };
 
-export function listen(listener: EventListener, events: Event["type"][]) {
+export function listen(listener: EventListener, ...events: Event["type"][]) {
   events.forEach((event) => {
-    listeners[event].push(listener);
+    if (!listeners[event].includes(listener)) {
+      listeners[event].push(listener);
+    }
   });
 }
 
